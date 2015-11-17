@@ -24,6 +24,21 @@ class SubmitControllerCreate extends AbstractController
 	private $model;
 
 	/**
+	 * Allowed Databse Types
+	 *
+	 * @var    array
+	 * @since  1.0
+	 */
+	private $databaseTypes = array(
+			'mysqli',
+			'mysql',
+			'postgresql',
+			'pdomysql',
+			'sqlazure',
+			'sqlsrv',
+		);
+
+	/**
 	 * Constructor.
 	 *
 	 * @param   StatsModel  $model  Statistics model object.
@@ -66,6 +81,11 @@ class SubmitControllerCreate extends AbstractController
 		$data['db_type']   = $input->getString('db_type');
 		$data['server_os'] = $input->getString('server_os');
 
+		// Perform some checks
+		$data['php_version'] = $this->checkPHPVersion($data['php_version']);
+		$data['cms_version'] = $this->checkCMSVersion($data['cms_version']);
+		$data['db_type']     = $this->checkDatabaseType($data['db_type']);
+
 		// We require at a minimum a unique ID and the CMS version
 		if (empty($data['unique_id']) || empty($data['cms_version']))
 		{
@@ -75,6 +95,17 @@ class SubmitControllerCreate extends AbstractController
 			);
 
 			throw new \RuntimeException('There was an error storing the data.', 401);
+		}
+
+		// We have checked some values if one of them is null reject the input
+		if (($data['cms_version'] == null) || ($data['db_type'] == null) || ($data['php_version'] == null))
+		{
+			$this->getApplication()->getLogger()->info(
+				"The request don't pass the tests",
+				['postData' => $data]
+			);
+
+			throw new \RuntimeException('There was an error in the data.', 401);
 		}
 
 		$this->model->save((object) $data);
@@ -87,5 +118,71 @@ class SubmitControllerCreate extends AbstractController
 		$this->getApplication()->setBody(json_encode($response));
 
 		return true;
+	}
+
+	/**
+	 * Check the CMS Version
+	 *
+	 * @return null|string  null on failiure else the CMS Version
+	 *
+	 * @since   1.0
+	 */
+	private function checkCMSVersion($data)
+	{
+		// The pulugin is installed since 3.5.0 other CMS Versions can't have this plugin installed.
+		// But lets be open for at least 3.0.0 ;)
+		if (version_compare($data, '3.0.0', '<'))
+		{
+			return null;
+		}
+
+		// Joomla 4 is not released skip it.
+		if (version_compare($data, '4.0.0', '>='))
+		{
+			return null;
+		}
+		
+		return $data;
+	}
+
+	/**
+	 * Check the Database type
+	 *
+	 * @return null|string  null on failiure else the Database type
+	 *
+	 * @since   1.0
+	 */
+	private function checkDatabaseType($data)
+	{
+		if (!in_array($data, $this->databaseTypes))
+		{
+			return null;
+		}
+		
+		return $data;
+	}
+
+	/**
+	 * Check the PHP Version
+	 *
+	 * @return null|string  null on failiure else the PHP Version
+	 *
+	 * @since   1.0
+	 */
+	private function checkPHPVersion($data)
+	{
+		// We only support < 5.3.10 ...
+		if (version_compare($data, '5.3.1', '<'))
+		{
+			return null;
+		}
+
+		// ... and 8.0.0 is not released ;)
+		if (version_compare($data, '8.0.0', '>='))
+		{
+			return null;
+		}
+		
+		return $data;
 	}
 }
