@@ -81,7 +81,7 @@ class SubmitControllerCreate extends AbstractController
 		$data['server_os'] = $input->getString('server_os');
 
 		// Perform some checks
-		$data['cms_version'] = $this->checkCMSVersion($data[cms_version]);
+		$data['cms_version'] = $this->checkCMSVersion($data['cms_version']);
 		$data['db_type']     = $this->checkDatabaseType($data['db_type']);
 
 		// We require at a minimum a unique ID and the CMS version
