@@ -97,8 +97,8 @@ class SubmitControllerCreate extends AbstractController
 			throw new \RuntimeException('There was an error storing the data.', 401);
 		}
 
-		// We have checked some values if one of them is false reject the input
-		if (($data['cms_version'] == false) || ($data['db_type'] == false) || ($data['php_version'] == false))
+		// We have checked some values if one of them is null reject the input
+		if (($data['cms_version'] == null) || ($data['db_type'] == null) || ($data['php_version'] == null))
 		{
 			$this->getApplication()->getLogger()->info(
 				"The request don't pass the tests",
@@ -123,7 +123,7 @@ class SubmitControllerCreate extends AbstractController
 	/**
 	 * Check the CMS Version
 	 *
-	 * @return  false on failiure else the CMS Version
+	 * @return null|string  null on failiure else the CMS Version
 	 *
 	 * @since   1.0
 	 */
@@ -133,13 +133,13 @@ class SubmitControllerCreate extends AbstractController
 		// But lets be open for at least 3.0.0 ;)
 		if (version_compare($data, '3.0.0', '<'))
 		{
-			return false;
+			return null;
 		}
 
 		// Joomla 4 is not released skip it.
 		if (version_compare($data, '4.0.0', '>='))
 		{
-			return false;
+			return null;
 		}
 		
 		return $data;
@@ -148,7 +148,7 @@ class SubmitControllerCreate extends AbstractController
 	/**
 	 * Check the Database type
 	 *
-	 * @return  false on failiure else the Database type
+	 * @return null|string  null on failiure else the Database type
 	 *
 	 * @since   1.0
 	 */
@@ -156,7 +156,7 @@ class SubmitControllerCreate extends AbstractController
 	{
 		if (!in_array($data, $this->databaseTypes))
 		{
-			return false;
+			return null;
 		}
 		
 		return $data;
@@ -165,7 +165,7 @@ class SubmitControllerCreate extends AbstractController
 	/**
 	 * Check the PHP Version
 	 *
-	 * @return  false on failiure else the PHP Version
+	 * @return null|string  null on failiure else the PHP Version
 	 *
 	 * @since   1.0
 	 */
@@ -174,13 +174,13 @@ class SubmitControllerCreate extends AbstractController
 		// We only support < 5.3.10 ...
 		if (version_compare($data, '5.3.1', '<'))
 		{
-			return false;
+			return null;
 		}
 
 		// ... and 8.0.0 is not released ;)
 		if (version_compare($data, '8.0.0', '>='))
 		{
-			return false;
+			return null;
 		}
 		
 		return $data;
