@@ -81,6 +81,7 @@ class SubmitControllerCreate extends AbstractController
 		$data['server_os'] = $input->getString('server_os');
 
 		// Perform some checks
+		$data['php_version'] = $this->checkPHPVersion($data['php_version']);
 		$data['cms_version'] = $this->checkCMSVersion($data['cms_version']);
 		$data['db_type']     = $this->checkDatabaseType($data['db_type']);
 
@@ -96,7 +97,7 @@ class SubmitControllerCreate extends AbstractController
 		}
 
 		// We have checked some values if one of them is false reject the input
-		if (($data['cms_version'] == false) || ($data['db_type'] == false))
+		if (($data['cms_version'] == false) || ($data['db_type'] == false) || ($data['php_version'] == false))
 		{
 			$this->getApplication()->getLogger()->info(
 				"The request don't pass the tests",
@@ -160,6 +161,30 @@ class SubmitControllerCreate extends AbstractController
 	private function checkDatabaseType($data)
 	{
 		if (!in_array($data, $databaseTypes))
+		{
+			return false;
+		}
+		
+		return $data;
+	}
+
+	/**
+	 * Check the CMS Version
+	 *
+	 * @return  false on failiure else the CMS Version
+	 *
+	 * @since   1.0
+	 */
+	private function checkPHPVersion($data)
+	{
+		// We only support < 5.3.10 ...
+		if (version_compare($data, '5.3.10', '<'))
+		{
+			return false;
+		}
+
+		// ... and 8.0.0 is not released ;)
+		if (version_compare($data, '8.0.0', '>='))
 		{
 			return false;
 		}
