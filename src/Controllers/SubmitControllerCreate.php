@@ -127,7 +127,7 @@ class SubmitControllerCreate extends AbstractController
 	 */
 	private function checkCMSVersion($data)
 	{
-		$dotchecks = explode('.' $data);
+		$dotchecks = explode('.', $data);
 
 		// We ever use 2 dots and 3 parts in our CMS Version
 		if (count($dotchecks) != 3)
