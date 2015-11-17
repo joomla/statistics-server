@@ -180,7 +180,7 @@ class SubmitControllerCreate extends AbstractController
 	private function checkPHPVersion($data)
 	{
 		// We only support < 5.3.10 ...
-		if (version_compare($data, '5.3.10', '<'))
+		if (version_compare($data, '5.3.1', '<'))
 		{
 			return false;
 		}
