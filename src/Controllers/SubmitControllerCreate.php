@@ -129,14 +129,6 @@ class SubmitControllerCreate extends AbstractController
 	 */
 	private function checkCMSVersion($data)
 	{
-		$dotchecks = explode('.', $data);
-
-		// We ever use 2 dots and 3 parts in our CMS Version
-		if (count($dotchecks) != 3)
-		{
-			return false;
-		}
-
 		// The pulugin is installed since 3.5.0 other CMS Versions can't have this plugin installed.
 		// But lets be open for at least 3.0.0 ;)
 		if (version_compare($data, '3.0.0', '<'))
