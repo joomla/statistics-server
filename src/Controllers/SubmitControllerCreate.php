@@ -34,7 +34,8 @@ class SubmitControllerCreate extends AbstractController
 			'mysql',
 			'postgresql',
 			'pdomysql',
-			'sqlazure'
+			'sqlazure',
+			'sqlsrv',
 		);
 
 	/**
