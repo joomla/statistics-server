@@ -140,6 +140,12 @@ class SubmitControllerCreate extends AbstractController
 		{
 			return false;
 		}
+
+		// Joomla 4 is not released skip it.
+		if (version_compare($data, '4.0.0', '>='))
+		{
+			return false;
+		}
 		
 		return $data;
 	}
