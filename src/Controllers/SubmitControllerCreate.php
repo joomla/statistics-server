@@ -160,7 +160,7 @@ class SubmitControllerCreate extends AbstractController
 	 */
 	private function checkDatabaseType($data)
 	{
-		if (!in_array($data, $databaseTypes))
+		if (!in_array($data, $this->databaseTypes))
 		{
 			return false;
 		}
