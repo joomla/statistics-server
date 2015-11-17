@@ -169,9 +169,9 @@ class SubmitControllerCreate extends AbstractController
 	}
 
 	/**
-	 * Check the CMS Version
+	 * Check the PHP Version
 	 *
-	 * @return  false on failiure else the CMS Version
+	 * @return  false on failiure else the PHP Version
 	 *
 	 * @since   1.0
 	 */
