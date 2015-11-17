@@ -136,8 +136,9 @@ class SubmitControllerCreate extends AbstractController
 			return false;
 		}
 
-		// The pulugin is installed since 3.5.0 other CMS Versions can't have this plugin installed
-		if (version_compare($data, '3.5.0', '<'))
+		// The pulugin is installed since 3.5.0 other CMS Versions can't have this plugin installed.
+		// But lets be open for at least 3.0.0 ;)
+		if (version_compare($data, '3.0.0', '<'))
 		{
 			return false;
 		}
