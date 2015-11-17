@@ -24,6 +24,20 @@ class SubmitControllerCreate extends AbstractController
 	private $model;
 
 	/**
+	 * Allowed Databse Types
+	 *
+	 * @var    array
+	 * @since  1.0
+	 */
+	private $databaseTypes = array(
+			'mysqli',
+			'mysql',
+			'postgresql',
+			'pdomysql',
+			'sqlazure'
+		);
+
+	/**
 	 * Constructor.
 	 *
 	 * @param   StatsModel  $model  Statistics model object.
@@ -66,6 +80,10 @@ class SubmitControllerCreate extends AbstractController
 		$data['db_type']   = $input->getString('db_type');
 		$data['server_os'] = $input->getString('server_os');
 
+		// Perform some checks
+		$data['cms_version'] = $this->checkCMSVersion($data[cms_version]);
+		$data['db_type']     = $this->checkDatabaseType($data['db_type']);
+
 		// We require at a minimum a unique ID and the CMS version
 		if (empty($data['unique_id']) || empty($data['cms_version']))
 		{
@@ -75,6 +93,17 @@ class SubmitControllerCreate extends AbstractController
 			);
 
 			throw new \RuntimeException('There was an error storing the data.', 401);
+		}
+
+		// We have checked some values if one of them is false reject the input
+		if (($data['cms_version'] == false) || ($data['db_type'] == false))
+		{
+			$this->getApplication()->getLogger()->info(
+				"The request don't pass the tests",
+				['postData' => $data]
+			);
+
+			throw new \RuntimeException('There was an error in the data.', 401);
 		}
 
 		$this->model->save((object) $data);
@@ -87,5 +116,48 @@ class SubmitControllerCreate extends AbstractController
 		$this->getApplication()->setBody(json_encode($response));
 
 		return true;
+	}
+
+	/**
+	 * Check the CMS Version
+	 *
+	 * @return  false on failiure else the CMS Version
+	 *
+	 * @since   1.0
+	 */
+	private function checkCMSVersion($data)
+	{
+		$dotchecks = explode('.' $data);
+
+		// We ever use 2 dots and 3 parts in our CMS Version
+		if (count($dotchecks) != 3)
+		{
+			return false;
+		}
+
+		// The pulugin is installed since 3.5.0 other CMS Versions can't have this plugin installed
+		if (version_compare($data, '3.5.0', '<'))
+		{
+			return false;
+		}
+		
+		return $data;
+	}
+
+	/**
+	 * Check the Database type
+	 *
+	 * @return  false on failiure else the Database type
+	 *
+	 * @since   1.0
+	 */
+	private function checkDatabaseType($data)
+	{
+		if (!in_array($data, $databaseTypes))
+		{
+			return false;
+		}
+		
+		return $data;
 	}
 }
