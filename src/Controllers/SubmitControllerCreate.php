@@ -180,10 +180,13 @@ class SubmitControllerCreate extends AbstractController
 			return false;
 		}
 
-		$majorVersion = substr($version, 0, 1);
-
 		// The version string should meet the minimum supported PHP version for 3.0.0 and be a released PHP version
-		if (version_compare($version, '5.3.1', '<') || version_compare($version, '8.0.0', '>=') || $majorVersion == 6)
+		if (version_compare($version, '5.3.1', '<') || version_compare($version, '8.0.0', '>='))
+		{
+			return false;
+		}
+
+		if (version_compare($version, '6.0.0', '>=') && version_compare($version, '7.0.0', '<'))
 		{
 			return false;
 		}
