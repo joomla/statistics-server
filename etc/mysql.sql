@@ -22,6 +22,34 @@ CREATE TABLE IF NOT EXISTS `jos_jstats_counter_phpversion` (
   KEY `idx_version_count` (`php_version`, `count`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `jos_jstats_counter_dbversion` (
+  `db_version` varchar(40) NOT NULL,
+  `count` INT NOT NULL,
+  PRIMARY KEY (`db_version`),
+  KEY `idx_version_count` (`db_version`, `count`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `jos_jstats_counter_dbtype` (
+  `db_type` varchar(40) NOT NULL,
+  `count` INT NOT NULL,
+  PRIMARY KEY (`db_type`),
+  KEY `idx_version_count` (`db_type`, `count`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `jos_jstats_counter_cmsversion` (
+  `cms_version` varchar(40) NOT NULL,
+  `count` INT NOT NULL,
+  PRIMARY KEY (`cms_version`),
+  KEY `idx_version_count` (`cms_version`, `count`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `jos_jstats_counter_server_os` (
+  `server_os` varchar(40) NOT NULL,
+  `count` INT NOT NULL,
+  PRIMARY KEY (`server_os`),
+  KEY `idx_version_count` (`server_os`, `count`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+
 DELIMITER $$
 CREATE
     TRIGGER `phpversion_insert` AFTER INSERT
@@ -56,12 +84,136 @@ CREATE
     END IF;
   END$$
 
+CREATE
+TRIGGER `dbversion_insert` AFTER INSERT
+ON `jos_jstats`
+FOR EACH ROW BEGIN
+  IF NEW.db_version not in (
+    SELECT counter.db_version
+    FROM jos_jstats_counter_dbversion AS counter
+    WHERE (NEW.db_version = counter.db_version)
+  ) THEN
+    INSERT INTO `jos_jstats_counter_dbversion` (db_version,count) VALUES(NEW.db_version,1);
+  ELSE
+    UPDATE `jos_jstats_counter_dbversion` SET count=count+1 WHERE `db_version` = NEW.db_version;
+  END IF;
+END$$
+
+CREATE
+TRIGGER `dbversion_update` AFTER UPDATE
+ON `jos_jstats`
+FOR EACH ROW BEGIN
+  IF OLD.db_version <> NEW.db_version THEN
+    UPDATE `jos_jstats_counter_dbversion` SET count=count-1 WHERE `db_version` = OLD.db_version;
+    IF NEW.db_version not in (
+      SELECT counter.db_version
+      FROM jos_jstats_counter_dbversion AS counter
+      WHERE (NEW.db_version = counter.db_version)
+    ) THEN
+      INSERT INTO `jos_jstats_counter_dbversion` (db_version,count) VALUES(NEW.db_version,1);
+    ELSE
+      UPDATE `jos_jstats_counter_dbversion` SET count=count+1 WHERE `db_version` = NEW.db_version;
+    END IF;
+  END IF;
+END$$
+
+CREATE
+TRIGGER `dbtype_insert` AFTER INSERT
+ON `jos_jstats`
+FOR EACH ROW BEGIN
+  IF NEW.db_type not in (
+    SELECT counter.db_type
+    FROM jos_jstats_counter_dbtype AS counter
+    WHERE (NEW.db_type = counter.db_type)
+  ) THEN
+    INSERT INTO `jos_jstats_counter_dbtype` (db_type,count) VALUES(NEW.db_type,1);
+  ELSE
+    UPDATE `jos_jstats_counter_dbtype` SET count=count+1 WHERE `db_type` = NEW.db_type;
+  END IF;
+END$$
+
+CREATE
+TRIGGER `dbtype_update` AFTER UPDATE
+ON `jos_jstats`
+FOR EACH ROW BEGIN
+  IF OLD.db_type <> NEW.db_type THEN
+    UPDATE `jos_jstats_counter_dbtype` SET count=count-1 WHERE `db_type` = OLD.db_type;
+    IF NEW.db_type not in (
+      SELECT counter.db_type
+      FROM jos_jstats_counter_dbtype AS counter
+      WHERE (NEW.db_type = counter.db_type)
+    ) THEN
+      INSERT INTO `jos_jstats_counter_dbtype` (db_type,count) VALUES(NEW.db_type,1);
+    ELSE
+      UPDATE `jos_jstats_counter_dbtype` SET count=count+1 WHERE `db_type` = NEW.db_type;
+    END IF;
+  END IF;
+END$$
+
+CREATE
+TRIGGER `cmversion_insert` AFTER INSERT
+ON `jos_jstats`
+FOR EACH ROW BEGIN
+  IF NEW.cms_version not in (
+    SELECT counter.cms_version
+    FROM jos_jstats_counter_cmsversion AS counter
+    WHERE (NEW.cms_version = counter.cms_version)
+  ) THEN
+    INSERT INTO `jos_jstats_counter_cmsversion` (cms_version,count) VALUES(NEW.cms_version,1);
+  ELSE
+    UPDATE `jos_jstats_counter_cmsversion` SET count=count+1 WHERE `cms_version` = NEW.cms_version;
+  END IF;
+END$$
+
+CREATE
+TRIGGER `cmsversion_update` AFTER UPDATE
+ON `jos_jstats`
+FOR EACH ROW BEGIN
+  IF OLD.cms_version <> NEW.cms_version THEN
+    UPDATE `jos_jstats_counter_cmsversion` SET count=count-1 WHERE `cms_version` = OLD.cms_version;
+    IF NEW.cms_version not in (
+      SELECT counter.cms_version
+      FROM jos_jstats_counter_cmsversion AS counter
+      WHERE (NEW.cms_version = counter.cms_version)
+    ) THEN
+      INSERT INTO `jos_jstats_counter_cmsversion` (cms_version,count) VALUES(NEW.cms_version,1);
+    ELSE
+      UPDATE `jos_jstats_counter_cmsversion` SET count=count+1 WHERE `cms_version` = NEW.cms_version;
+    END IF;
+  END IF;
+END$$
+
+CREATE
+TRIGGER `cmversion_insert` AFTER INSERT
+ON `jos_jstats`
+FOR EACH ROW BEGIN
+  IF NEW.cms_version not in (
+    SELECT counter.cms_version
+    FROM jos_jstats_counter_cmsversion AS counter
+    WHERE (NEW.cms_version = counter.cms_version)
+  ) THEN
+    INSERT INTO `jos_jstats_counter_cmsversion` (cms_version,count) VALUES(NEW.cms_version,1);
+  ELSE
+    UPDATE `jos_jstats_counter_cmsversion` SET count=count+1 WHERE `cms_version` = NEW.cms_version;
+  END IF;
+END$$
+
+CREATE
+TRIGGER `cmsversion_update` AFTER UPDATE
+ON `jos_jstats`
+FOR EACH ROW BEGIN
+  IF OLD.cms_version <> NEW.cms_version THEN
+    UPDATE `jos_jstats_counter_cmsversion` SET count=count-1 WHERE `cms_version` = OLD.cms_version;
+    IF NEW.cms_version not in (
+      SELECT counter.cms_version
+      FROM jos_jstats_counter_cmsversion AS counter
+      WHERE (NEW.cms_version = counter.cms_version)
+    ) THEN
+      INSERT INTO `jos_jstats_counter_cmsversion` (cms_version,count) VALUES(NEW.cms_version,1);
+    ELSE
+      UPDATE `jos_jstats_counter_cmsversion` SET count=count+1 WHERE `cms_version` = NEW.cms_version;
+    END IF;
+  END IF;
+END$$
+
 DELIMITER ;
-
-
-
-SELECT c.count, stats.db_type
-FROM `jos_jstats` AS stats
-  LEFT JOIN `jos_jstats_counter_phpversion` AS c ON c.php_version = stats.php_version
-WHERE stats.db_type = 'mysql'
-GROUP BY stats.php_version
