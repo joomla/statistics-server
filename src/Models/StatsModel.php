@@ -49,7 +49,7 @@ class StatsModel extends AbstractDatabaseModel
 				$db->getQuery(true)
 					->select('*')
 					->from('#__jstats_counter_' . $column)
-			)->loadAssocList($column);
+			)->loadAssocList();
 		}
 
 		// If fetching all data from the table, we need to break this down a fair bit otherwise we're going to run out of memory

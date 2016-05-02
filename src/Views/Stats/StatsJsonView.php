@@ -207,15 +207,15 @@ class StatsJsonView extends BaseJsonView
 
 		$this->totalItems = 0;
 
-		foreach ($items as $key => $item)
+		foreach ($items as $item)
 		{
 			// Special case, if the server is empty then change the key to "unknown"
-			if ($this->source === 'server_os' && empty(trim($key)))
+			if ($this->source === 'server_os' && empty(trim($item[$this->source])))
 			{
-				$key = 'unknown';
+				$item[$this->source] = 'unknown';
 			}
 
-			$data[$this->source][$key] = $item['count'];
+			$data[$this->source][$item[$this->source]] = $item['count'];
 			$this->totalItems += $item['count'];
 		}
 
