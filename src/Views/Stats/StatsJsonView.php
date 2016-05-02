@@ -88,8 +88,7 @@ class StatsJsonView extends BaseJsonView
 		// If we have the entire database, we have to loop within each group to put it all together
 		foreach ($items as $group)
 		{
-			$this->totalItems += count($group);
-
+			$this->totalItems = 0;
 			foreach ($group as $item)
 			{
 				foreach ($this->dataSources as $source)
@@ -97,24 +96,14 @@ class StatsJsonView extends BaseJsonView
 					if (isset($item[$source]) && !is_null($item[$source]))
 					{
 						// Special case, if the server is empty then change the key to "unknown"
-						if ($source === 'server_os' && empty($item[$source]))
+						if ($source === 'server_os' && empty(trim($item[$source])))
 						{
-							if (!isset(${$source}['unknown']))
-							{
-								${$source}['unknown'] = 0;
-							}
-
-							${$source}['unknown']++;
+							$item[$source] = 'unknown';
 						}
-						else
-						{
-							if (!isset(${$source}[$item[$source]]))
-							{
-								${$source}[$item[$source]] = 0;
-							}
 
-							${$source}[$item[$source]]++;
-						}
+						${$source}[$item[$source]] = $item['count'];
+
+						$this->totalItems += $item['count'];
 					}
 				}
 			}

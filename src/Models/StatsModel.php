@@ -13,14 +13,6 @@ use Joomla\Model\AbstractDatabaseModel;
 class StatsModel extends AbstractDatabaseModel
 {
 	/**
-	 * The query batch size
-	 *
-	 * @var    integer
-	 * @since  1.0
-	 */
-	private $batchSize = 25000;
-
-	/**
 	 * Loads the statistics data from the database.
 	 *
 	 * @param   string  $column  A single column to filter on
@@ -52,46 +44,23 @@ class StatsModel extends AbstractDatabaseModel
 			)->loadAssocList();
 		}
 
-		// If fetching all data from the table, we need to break this down a fair bit otherwise we're going to run out of memory
-		$totalRecords = $db->setQuery(
-			$db->getQuery(true)
-				->select('COUNT(unique_id)')
-				->from('#__jstats')
-		)->loadResult();
+		$columnList = $db->getTableColumns('#__jstats');
+		$return     = [];
 
-		$return = [];
-
-		$query = $db->getQuery(true)
-			->select(['php_version', 'db_type', 'db_version', 'cms_version', 'server_os'])
-			->from('#__jstats')
-			->group('unique_id');
-
-		$limitable = $query instanceof LimitableInterface;
-
-		// We can't have this as a single array, we run out of memory... This is gonna get interesting...
-		for ($offset = 0; $offset < $totalRecords; $offset + $this->batchSize)
+		foreach (array_keys($columnList) as $column)
 		{
-			if ($limitable)
+			// The column should exist in the table and be part of the API
+			if (in_array($column, ['unique_id', 'modified']))
 			{
-				$query->setLimit($this->batchSize, $offset);
-
-				$db->setQuery($query);
-			}
-			else
-			{
-				$db->setQuery($query, $offset, $this->batchSize);
+				continue;
 			}
 
-			$return[] = $db->loadAssocList();
-
-			$offset += $this->batchSize;
+			$return[$column] = $db->setQuery(
+				$db->getQuery(true)
+					->select('*')
+					->from('#__jstats_counter_' . $column)
+			)->loadAssocList();
 		}
-
-		// Disconnect the DB to free some memory
-		$db->disconnect();
-
-		// And unset some variables
-		unset($db, $query, $offset, $totalRecords);
 
 		return $return;
 	}

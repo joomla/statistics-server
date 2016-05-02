@@ -95,16 +95,6 @@ CREATE
           UPDATE `jos_jstats_counter_cms_version` SET count=count+1 WHERE `cms_version` = NEW.cms_version;
         END IF;
 
-        IF NEW.cms_version not in (
-          SELECT counter.cms_version
-          FROM jos_jstats_counter_cms_version AS counter
-          WHERE (NEW.cms_version = counter.cms_version)
-        ) THEN
-          INSERT INTO `jos_jstats_counter_cms_version` (cms_version,count) VALUES(NEW.cms_version,1);
-        ELSE
-          UPDATE `jos_jstats_counter_cms_version` SET count=count+1 WHERE `cms_version` = NEW.cms_version;
-        END IF;
-
         IF NEW.server_os not in (
           SELECT counter.server_os
           FROM jos_jstats_counter_server_os AS counter
@@ -172,25 +162,12 @@ CREATE
       END IF;
     END IF;
 
-    IF OLD.cms_version <> NEW.cms_version THEN
-      UPDATE `jos_jstats_counter_cms_version` SET count=count-1 WHERE `cms_version` = OLD.cms_version;
-      IF NEW.cms_version not in (
-        SELECT counter.cms_version
-        FROM jos_jstats_counter_cms_version AS counter
-        WHERE (NEW.cms_version = counter.cms_version)
-      ) THEN
-        INSERT INTO `jos_jstats_counter_cms_version` (cms_version,count) VALUES(NEW.cms_version,1);
-      ELSE
-        UPDATE `jos_jstats_counter_cms_version` SET count=count+1 WHERE `cms_version` = NEW.cms_version;
-      END IF;
-    END IF;
-
-    IF OLD.cms_version <> NEW.cms_version THEN
+    IF OLD.server_os <> NEW.server_os THEN
       UPDATE `jos_jstats_counter_server_os` SET count=count-1 WHERE `server_os` = OLD.server_os;
       IF NEW.server_os not in (
         SELECT counter.server_os
         FROM jos_jstats_counter_server_os AS counter
-        WHERE (NEW.cms_version = counter.server_os)
+        WHERE (NEW.server_os = counter.server_os)
       ) THEN
         INSERT INTO `jos_jstats_counter_server_os` (server_os,count) VALUES(NEW.server_os,1);
       ELSE
