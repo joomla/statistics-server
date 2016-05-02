@@ -210,7 +210,7 @@ class StatsJsonView extends BaseJsonView
 		foreach ($items as $key => $item)
 		{
 			// Special case, if the server is empty then change the key to "unknown"
-			if ($this->source === 'server_os' && empty($key))
+			if ($this->source === 'server_os' && empty(trim($key)))
 			{
 				$key = 'unknown';
 			}
