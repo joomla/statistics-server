@@ -205,35 +205,18 @@ class StatsJsonView extends BaseJsonView
 			${$this->source} = [],
 		];
 
-		$this->totalItems = count($items);
+		$this->totalItems = 0;
 
-		foreach ($items as $item)
+		foreach ($items as $key => $item)
 		{
-			foreach ($this->dataSources as $source)
+			// Special case, if the server is empty then change the key to "unknown"
+			if ($this->source === 'server_os' && empty($key))
 			{
-				if (isset($item[$source]) && !is_null($item[$source]))
-				{
-					// Special case, if the server is empty then change the key to "unknown"
-					if ($source === 'server_os' && empty($item[$source]))
-					{
-						if (!isset($data[$source]['unknown']))
-						{
-							$data[$source]['unknown'] = 0;
-						}
-
-						$data[$source]['unknown']++;
-					}
-					else
-					{
-						if (!isset($data[$source][$item[$source]]))
-						{
-							$data[$source][$item[$source]] = 0;
-						}
-
-						$data[$source][$item[$source]]++;
-					}
-				}
+				$key = 'unknown';
 			}
+
+			$data[$this->source][$key] = $item['count'];
+			$this->totalItems += $item['count'];
 		}
 
 		$responseData = $this->buildResponseData($data);
