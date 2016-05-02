@@ -37,23 +37,19 @@ class StatsModel extends AbstractDatabaseModel
 		// Validate the requested column is actually in the table
 		if ($column !== null)
 		{
-			switch ($column)
-			{
-				case 'php_version':
-				case 'db_version':
-				case 'db_type':
-				case 'cms_version':
-				case 'server_os':
-					return $db->setQuery(
-						$db->getQuery(true)
-							->select('*')
-							->from('#__jstats_counter_' . $column)
-					)->loadAssocList($column);
-					break;
+			$columnList = $db->getTableColumns('#__jstats');
 
-				default:
-					throw new \InvalidArgumentException('An invalid data source was requested.', 404);
+			// The column should exist in the table and be part of the API
+			if (!in_array($column, array_keys($columnList)) && !in_array($column, ['unique_id', 'modified']))
+			{
+				throw new \InvalidArgumentException('An invalid data source was requested.', 404);
 			}
+
+			return $db->setQuery(
+				$db->getQuery(true)
+					->select('*')
+					->from('#__jstats_counter_' . $column)
+			)->loadAssocList($column);
 		}
 
 		// If fetching all data from the table, we need to break this down a fair bit otherwise we're going to run out of memory
