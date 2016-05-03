@@ -25,6 +25,7 @@ class StatsModel extends AbstractDatabaseModel
 	public function getItems($column = null)
 	{
 		$db = $this->getDb();
+		$query = $db->getQuery(true);
 
 		// Validate the requested column is actually in the table
 		if ($column !== null)
@@ -38,9 +39,9 @@ class StatsModel extends AbstractDatabaseModel
 			}
 
 			return $db->setQuery(
-				$db->getQuery(true)
+				$query
 					->select('*')
-					->from('#__jstats_counter_' . $column)
+					->from($db->quoteName('#__jstats_counter_' . $column))
 			)->loadAssocList();
 		}
 
@@ -56,9 +57,9 @@ class StatsModel extends AbstractDatabaseModel
 			}
 
 			$return[$column] = $db->setQuery(
-				$db->getQuery(true)
+				$query->clear()
 					->select('*')
-					->from('#__jstats_counter_' . $column)
+					->from($db->quoteName('#__jstats_counter_' . $column))
 			)->loadAssocList();
 		}
 
