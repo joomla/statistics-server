@@ -59,6 +59,13 @@ CREATE TABLE IF NOT EXISTS `#__jstats_counter_server_os` (
   KEY `idx_version_count` (`server_os`, `count`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `#__jstats_counter_cms_php_version` (
+  `cms_version` varchar(15) NOT NULL,
+  `php_version` varchar(15) NOT NULL,
+  `count` INT NOT NULL,
+  PRIMARY KEY (`cms_version`,`php_version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+
 DELIMITER $$
 
 CREATE
@@ -130,6 +137,20 @@ TRIGGER `stat_insert`
       UPDATE `#__jstats_counter_server_os`
       SET count = count + 1
       WHERE `server_os` = NEW.server_os;
+    END IF;
+
+	IF NOT EXISTS (SELECT 1
+      FROM `#__jstats_counter_cms_php_version` AS counter
+      WHERE NEW.php_version = counter.php_version
+        and NEW.cms_version = counter.cms_version
+    )
+    THEN
+      INSERT INTO `#_jstats_counter_cms_php_version` (cms_version, php_version, count) VALUES (NEW.cms_version, NEW.php_version, 1);
+    ELSE
+      UPDATE `#__jstats_counter_cms_php_version`
+      SET count = count + 1
+      WHERE `php_version` = NEW.php_version
+	  AND cms_version = NEW.cms_version
     END IF;
   END$$
 
