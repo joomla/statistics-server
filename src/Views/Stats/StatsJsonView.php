@@ -106,6 +106,12 @@ class StatsJsonView extends BaseJsonView
 
 		if ($this->source)
 		{
+			// The new combined API endPoint
+			if ($this->source === 'cms_php')
+			{
+				return $this->processCombined($items);
+			}
+
 			return $this->processSingleSource($items);
 		}
 
@@ -332,5 +338,35 @@ class StatsJsonView extends BaseJsonView
 		}
 
 		return $responseData;
+	}
+/**
+	 * Process the response for a combined data source.
+	 *
+	 * @param   array  $items  The source items to process.
+	 *
+	 * @return  string  The rendered view.
+	 */
+	private function processCombined(array $items) : string
+	{
+		$data = [
+			${$this->source} = [],
+		];
+
+		$this->totalItems = 0;
+
+		foreach ($items as $item)
+		{
+			$data[$this->source][$item['cms_version'] . ':' . $item['php_version']]= $item['count'];
+			$this->totalItems += $item['count'];
+		}
+
+
+		$responseData = $this->buildResponseData($data);
+
+		$responseData['total'] = $this->totalItems;
+
+		$this->addData('data', $responseData);
+
+		return parent::render();
 	}
 }
