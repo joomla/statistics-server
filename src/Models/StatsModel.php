@@ -46,6 +46,16 @@ class StatsModel implements DatabaseModelInterface
 		$query      = $db->getQuery(true);
 		$columnList = $db->getTableColumns('#__jstats');
 
+		// The new endPoint
+		if ($column === 'cms_php')
+		{
+			return $db->setQuery(
+				$query
+					->select('*')
+					->from($db->quoteName('#__jstats_counter_cms_php_version'))
+			)->loadAssocList();
+		}
+
 		// Validate the requested column is actually in the table
 		if ($column !== '')
 		{
