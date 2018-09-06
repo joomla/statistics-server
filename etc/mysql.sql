@@ -145,7 +145,7 @@ TRIGGER `stat_insert`
         and NEW.cms_version = counter.cms_version
     )
     THEN
-      INSERT INTO `#_jstats_counter_cms_php_version` (cms_version, php_version, count) VALUES (NEW.cms_version, NEW.php_version, 1);
+      INSERT INTO `#__jstats_counter_cms_php_version` (cms_version, php_version, count) VALUES (NEW.cms_version, NEW.php_version, 1);
     ELSE
       UPDATE `#__jstats_counter_cms_php_version`
       SET count = count + 1
@@ -254,6 +254,30 @@ TRIGGER `stat_update`
         WHERE `server_os` = NEW.server_os;
       END IF;
     END IF;
-  END$$
+  
+  IF (OLD.php_version <> NEW.php_version AND OLD.cms_version <> NEW.cms_version) OR
+   (OLD.php_version = NEW.php_version AND OLD.cms_version <> NEW.cms_version) OR
+   (OLD.php_version <> NEW.php_version AND OLD.cms_version = NEW.cms_version)
+    THEN
+      UPDATE `#__jstats_counter_cms_php_version`
+      SET count = count - 1
+      WHERE `php_version` = OLD.php_version
+        AND `cms_version` = OLD.cms_version;
+
+      IF NOT EXISTS (SELECT 1
+        FROM `#__jstats_counter_cms_php_version` AS counter
+        WHERE NEW.php_version = counter.php_version
+          AND NEW.cms_version = counter.cms_version
+      )
+      THEN
+       INSERT INTO `#__jstats_counter_cms_php_version` (cms_version, php_version, count) VALUES (NEW.cms_version, NEW.php_version, 1);
+      ELSE
+       UPDATE `#__jstats_counter_cms_php_version`
+       SET count = count + 1
+       WHERE `php_version` = NEW.php_version
+	 AND `cms_version` = NEW.cms_version;
+      END IF;
+ END IF;
+END$$
 
 DELIMITER ;
