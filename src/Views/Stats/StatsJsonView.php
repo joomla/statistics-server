@@ -333,4 +333,30 @@ class StatsJsonView extends BaseJsonView
 
 		return $responseData;
 	}
+
+	/**
+	 * Process the response for a combined data source.
+	 *
+	 * @param   array  $items  The source items to process.
+	 *
+	 * @return  string  The rendered view.
+	 */
+	private function processCombinedDb(array $items) : string
+	{
+		$data = [];
+
+		$this->totalItems = 0;
+
+		foreach ($items as $item)
+		{
+			$data[$this->source][$item['db_type']][$item['db_version']]= $item['count'];
+			$this->totalItems += $item['count'];
+		}
+
+		$data['total'] = $this->totalItems;
+
+		$this->addData('data', $data);
+
+		return parent::render();
+	}
 }
