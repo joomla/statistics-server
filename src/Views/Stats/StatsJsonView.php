@@ -237,8 +237,6 @@ class StatsJsonView extends BaseJsonView
 			$this->totalItems += $item['count'];
 		}
 
-		unset($generator);
-
 		$responseData = $this->buildResponseData($data);
 
 		$responseData['total'] = $this->totalItems;
@@ -339,8 +337,8 @@ class StatsJsonView extends BaseJsonView
 
 		return $responseData;
 	}
-/**
-	 * Process the response for a combined data source.
+	/**
+	 * Process the response for a combined cms_php data source.
 	 *
 	 * @param   array  $items  The source items to process.
 	 *
@@ -348,24 +346,19 @@ class StatsJsonView extends BaseJsonView
 	 */
 	private function processCombined(array $items) : string
 	{
-		$data = [
-			${$this->source} = [],
-		];
+		$data = [];
 
 		$this->totalItems = 0;
 
 		foreach ($items as $item)
 		{
-			$data[$this->source][$item['cms_version'] . ':' . $item['php_version']]= $item['count'];
+			$data[$this->source][$item['cms_version']][$item['php_version']]= $item['count'];
 			$this->totalItems += $item['count'];
 		}
 
+		$data['total'] = $this->totalItems;
 
-		$responseData = $this->buildResponseData($data);
-
-		$responseData['total'] = $this->totalItems;
-
-		$this->addData('data', $responseData);
+		$this->addData('data', $data);
 
 		return parent::render();
 	}
