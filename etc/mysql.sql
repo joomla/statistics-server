@@ -59,6 +59,13 @@ CREATE TABLE IF NOT EXISTS `#__jstats_counter_server_os` (
   KEY `idx_version_count` (`server_os`, `count`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `#__jstats_counter_db_type_version` (
+  `db_type` varchar(15) NOT NULL,
+  `db_version` varchar(15) NOT NULL,
+  `count` INT NOT NULL,
+  PRIMARY KEY (`db_type`,`db_version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
+
 DELIMITER $$
 
 CREATE
@@ -131,6 +138,21 @@ TRIGGER `stat_insert`
       SET count = count + 1
       WHERE `server_os` = NEW.server_os;
     END IF;
+
+    IF NOT EXISTS (SELECT 1
+      FROM `#__jstats_counter_db_type_version` AS counter
+      WHERE NEW.db_type = counter.db_type
+        and NEW.db_version = counter.db_version
+    )
+    THEN
+      INSERT INTO `#__jstats_counter_db_type_version` (db_type, db_version, count) VALUES (NEW.db_type, NEW.db_version, 1);
+    ELSE
+      UPDATE `#__jstats_counter_db_type_version`
+      SET count = count + 1
+      WHERE `db_type` = NEW.db_type
+	  AND db_version = NEW.db_version
+    END IF;
+  
   END$$
 
 CREATE
@@ -233,6 +255,28 @@ TRIGGER `stat_update`
         WHERE `server_os` = NEW.server_os;
       END IF;
     END IF;
-  END$$
+    
+ IF NOT (OLD.db_type = NEW.db_type AND OLD.db_version = NEW.db_version)
+    THEN
+      UPDATE `#__jstats_counter_db_type_version`
+      SET count = count - 1
+      WHERE `db_type` = OLD.db_type
+        AND `db_version` = OLD.db_version;
+      IF NOT EXISTS (SELECT 1
+        FROM `#__jstats_counter_db_type_version` AS counter
+        WHERE NEW.db_type = counter.db_type
+          AND NEW.db_versionn = counter.db_version
+      )
+      THEN
+       INSERT INTO `#__jstats_counter_db_type_version` (db_type, db_version, count) VALUES (NEW.db_type, NEW.db_version, 1);
+      ELSE
+       UPDATE `#__jstats_counter_db_type_version`
+       SET count = count + 1
+       WHERE `db_type` = NEW.db_type
+	       AND `db_version` = NEW.db_version;
+      END IF;
+  END IF;
+  
+ END$$
 
 DELIMITER ;
