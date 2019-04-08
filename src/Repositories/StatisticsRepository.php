@@ -21,7 +21,7 @@ class StatisticsRepository
 	 *
 	 * @var  string[]
 	 */
-	public const ALLOWED_SOURCES = ['php_version', 'db_type', 'db_version', 'cms_version', 'server_os'];
+	public const ALLOWED_SOURCES = ['php_version', 'db_type', 'db_version', 'cms_version', 'server_os', 'cms_php_version', 'db_type_version'];
 
 	/**
 	 * The database driver.
