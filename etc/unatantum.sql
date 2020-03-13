@@ -25,10 +25,10 @@ GROUP BY cms_version;
 
 INSERT INTO `#__jstats_counter_cms_php_version`
 SELECT  cms_version, php_version , COUNT(*) as count
-FROM jstats 
+FROM `#__jstats`
 GROUP BY cms_version, php_version;
 
 INSERT INTO `#__jstats_counter_db_type_version`
 SELECT  db_type, db_version , COUNT(*) as count
-FROM jstats 
+FROM `#__jstats`
 GROUP BY db_type, db_version;
