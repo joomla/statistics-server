@@ -9,12 +9,12 @@
 namespace Joomla\StatsServer\Views\Stats;
 
 use Joomla\StatsServer\Repositories\StatisticsRepository;
-use Joomla\View\BaseJsonView;
+use Joomla\View\JsonView;
 
 /**
  * JSON response for requesting the stats data.
  */
-class StatsJsonView extends BaseJsonView
+class StatsJsonView extends JsonView
 {
 	/**
 	 * Flag if the response should return the raw data.
@@ -140,8 +140,12 @@ class StatsJsonView extends BaseJsonView
 								{
 									$item[$source] = 'unknown';
 								}
+
 								${$source}[$item[$source]] = $item['count'];
+
+								$this->totalItems += $item['count'];
 							}
+
 							break;
 
 						case 'cms_php_version':
@@ -149,8 +153,10 @@ class StatsJsonView extends BaseJsonView
 							{
 								$index = $item['cms_version'] . ' - ' . $item['php_version'];
 								$cms_php_version[$index] = $item['count'];
-								$this->totalItems += $item['count'];								
+
+								$this->totalItems += $item['count'];
 							}
+
 							break;
 
 						case 'db_type_version':
@@ -158,15 +164,19 @@ class StatsJsonView extends BaseJsonView
 							{
 								$index = $item['db_type'] . ' - ' . $item['db_version'];
 								$db_type_version[$index] = $item['count'];
-								$this->totalItems += $item['count'];								
+
+								$this->totalItems += $item['count'];
 							}
+
 							break;
 
 						default:
 							if (isset($item[$source]) && $item[$source] !== null)
 							{
 								${$source}[$item[$source]] = $item['count'];
+								$this->totalItems += $item['count'];
 							}
+
 							break;
 					}
 				}
