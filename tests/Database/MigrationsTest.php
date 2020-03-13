@@ -62,7 +62,7 @@ class MigrationsTest extends DatabaseTestCase
 
 		$this->assertTrue($status->tableExists);
 		$this->assertSame('20160618001', $status->currentVersion);
-		$this->assertSame(1, $status->missingMigrations);
+		$this->assertGreaterThanOrEqual(1, $status->missingMigrations);
 	}
 
 	/**
