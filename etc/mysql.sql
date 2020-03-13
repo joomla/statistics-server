@@ -22,7 +22,8 @@ CREATE TABLE `#__migrations` (
 
 INSERT INTO `#__migrations` (`version`) VALUES
 ('20160618001'),
-('20180413001');
+('20180413001'),
+('20200313001');
 
 CREATE TABLE IF NOT EXISTS `#__jstats_counter_php_version` (
   `php_version` varchar(15) NOT NULL,
