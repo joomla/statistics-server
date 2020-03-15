@@ -95,14 +95,44 @@ class StatisticsRepository
 
 		foreach (self::ALLOWED_SOURCES as $column)
 		{
-			$return[$column] = $this->db->setQuery(
-				$this->db->getQuery(true)
-					->select($column)
-					->select('COUNT(' . $column . ') AS count')
-					->from($this->db->quoteName('#__jstats'))
-					->where('modified BETWEEN DATE_SUB(NOW(), INTERVAL 90 DAY) AND NOW()')
-					->group($column)
-			)->loadAssocList();
+			if (($column !== 'cms_php_version') && ($column !== 'db_type_version'))
+			{
+				$return[$column] = $this->db->setQuery(
+					$this->db->getQuery(true)
+						->select($column)
+						->select('COUNT(' . $column . ') AS count')
+						->from($this->db->quoteName('#__jstats'))
+						->where('modified BETWEEN DATE_SUB(NOW(), INTERVAL 90 DAY) AND NOW()')
+						->group($column)
+				)->loadAssocList();
+				continue;
+			}
+
+			if ($column === 'cms_php_version')
+			{
+				$return['cms_php_version'] = $this->db->setQuery(
+					$this->db->getQuery(true)
+						->select('CONCAT(' . $this->db->quoteName('cms_version') . ', ' . $this->db->quote(' - ') . ', ' . $this->db->quoteName('php_version') . ') AS cms_php_version')
+						->select('COUNT(*) AS count')
+						->from($this->db->quoteName('#__jstats'))
+						->where('modified BETWEEN DATE_SUB(NOW(), INTERVAL 90 DAY) AND NOW()')
+						->group('CONCAT(' . $this->db->quoteName('cms_version') . ', ' . $this->db->quote(' - ') . ', ' . $this->db->quoteName('php_version') . ')')
+				)->loadAssocList();
+				continue;
+			}
+
+			if ($column === 'db_type_version')
+			{
+				$return['db_type_version'] = $this->db->setQuery(
+					$this->db->getQuery(true)
+						->select('CONCAT(' . $this->db->quoteName('db_type') . ', ' . $this->db->quote(' - ') . ', ' . $this->db->quoteName('db_version') . ') AS db_type_version')
+						->select('COUNT(*) AS count')
+						->from($this->db->quoteName('#__jstats'))
+						->where('modified BETWEEN DATE_SUB(NOW(), INTERVAL 90 DAY) AND NOW()')
+						->group('CONCAT(' . $this->db->quoteName('db_type') . ', ' . $this->db->quote(' - ') . ', ' . $this->db->quoteName('db_version') . ')')
+				)->loadAssocList();
+				continue;
+			}
 		}
 
 		return $return;
