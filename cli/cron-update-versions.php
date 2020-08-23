@@ -17,7 +17,6 @@ if (!file_exists(APPROOT . '/vendor/autoload.php'))
 
 require APPROOT . '/vendor/autoload.php';
 
-
 use Joomla\Http\HttpFactory;
 use Joomla\Registry\Registry;
 
@@ -140,12 +139,9 @@ while ($php530found === false)
     $page++;
 }
 
-
-
 // Create output JSON
 $joomlaJson = json_encode($joomlaJsonData);
 $phpJson = json_encode($phpJsonData);
-
 
 // Write JSON to file
 file_put_contents(APPROOT . '/versions/joomla.json', $joomlaJson);
