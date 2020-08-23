@@ -97,24 +97,29 @@ foreach ($joomlaLatestReleases->branches as $joomlaLatestRelease)
 }
 
 $php530found = false;
+$page = 1;
 
 while ($php530found === false)
 {
-	$page = 0;
-
 	// Get all PHP Releases via GitHub Releases
 	$phpReleases = json_decode(
 		$http->get(
-			'https://api.github.com/repos/php/php-src/tags?page=' . $page,
+			'https://api.github.com/repos/php/php-src/tags?per_page=100&page=' . $page,
 			[
 				'Accept' => 'application/vnd.github.v3+json',
-				'token' => $configuration->get('github.gh.token')
+				'Authorization' => 'token ' . $configuration->get('github.gh.token')
 			]
 		)->body
 	);
 
 	foreach ($phpReleases as $phpRelease)
 	{
+		if (!isset($phpRelease->name))
+		{
+			// Seems we hit the API limit or the GitHub API has issues
+			die(5);
+		}
+
 		if (substr($phpRelease->name, 0, 4) === 'php-')
 		{
 			//$phpVersion = preg_replace('/[^0-9.]/', '', $phpRelease->name);
@@ -128,6 +133,7 @@ while ($php530found === false)
 			if ($phpVersion === '5.3.0')
 			{
 				$php530found = true;
+				break;
 			}
 		}
 	}
