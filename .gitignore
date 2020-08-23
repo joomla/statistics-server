@@ -5,3 +5,5 @@
 /etc/config.json
 /.php_cs.cache
 /.phpunit.result.cache
+/versions/joomla.json
+/versions/php.json

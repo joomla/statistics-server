@@ -26,7 +26,7 @@ $configuration->loadFile(APPROOT . '/etc/config.json');
 
 $http = new HttpFactory;
 $http = $http->getHttp([
-    'userAgent' => 'Joomla! Statistics Server v1',
+	'userAgent' => 'Joomla! Statistics Server v1',
 ]);
 
 $phpJsonData = [];
@@ -37,38 +37,38 @@ $joomlaReleases = json_decode($http->get('https://downloads.joomla.org/api/v1/re
 
 if (!isset($joomlaReleases->releases))
 {
-    // Exiting here as it seems the API has issues.
-    exit;
+	// Exiting here as it seems the API has issues.
+	die(1);
 }
 
 foreach ($joomlaReleases->releases as $joomlaRelease)
 {
-    /**
-     * object(stdClass)#8 (4) {
-     *   ["version"]=>
-     *   string(6) "3.9.20"
-     *   ["branch"]=>
-     *   string(9) "Joomla! 3"
-     *   ["date"]=>
-     *   string(25) "2020-07-14T15:00:00+00:00"
-     *   ["relationships"]=>
-     *   object(stdClass)#5 (1) {
-     *    ["signatures"]=>
-     *    string(57) "https://downloads.joomla.org/api/v1/signatures/cms/3-9-20"
-     *   }
-     * }
-     */
+	/**
+	 * object(stdClass)#8 (4) {
+	 *   ["version"]=>
+	 *   string(6) "3.9.20"
+	 *   ["branch"]=>
+	 *   string(9) "Joomla! 3"
+	 *   ["date"]=>
+	 *   string(25) "2020-07-14T15:00:00+00:00"
+	 *   ["relationships"]=>
+	 *   object(stdClass)#5 (1) {
+	 *    ["signatures"]=>
+	 *    string(57) "https://downloads.joomla.org/api/v1/signatures/cms/3-9-20"
+	 *   }
+	 * }
+	 */
 
-    // We only want Joomla 3 and 4 Releases here
-    if ($joomlaRelease->branch === 'Joomla! 3' || $joomlaRelease->branch === 'Joomla! 4')
-    {
-        $joomlaJsonData[] = $joomlaRelease->version;
-    }
+	// We only want Joomla 3 and 4 Releases here
+	if ($joomlaRelease->branch === 'Joomla! 3' || $joomlaRelease->branch === 'Joomla! 4')
+	{
+		$joomlaJsonData[] = $joomlaRelease->version;
+	}
 }
 
 if (!in_array('4.0.0', $joomlaJsonData))
 {
-    $joomlaJsonData[] = '4.0.0';
+	$joomlaJsonData[] = '4.0.0';
 }
 
 // Make sure the current release +1 is in that JSON
@@ -77,66 +77,62 @@ $joomlaLatestReleases = json_decode($http->get('https://downloads.joomla.org/api
 
 if (!isset($joomlaLatestReleases->branches))
 {
-    // Exiting here as it seems the API has issues.
-    exit;
+	// Exiting here as it seems the API has issues.
+	die(5);
 }
 
 foreach ($joomlaLatestReleases->branches as $joomlaLatestRelease)
 {
-    // We only want Joomla 3 and 4 Releases here
-    if ($joomlaLatestRelease->branch === 'Joomla! 3' || $joomlaLatestRelease->branch === 'Joomla! 4')
-    {
-        list($major, $minor, $patch) = explode('.', $joomlaLatestRelease->version);
-        $major = (int) $major;
-        $minor = (int) $minor;
-        $patch = (int) $patch;
-        $patch++;
+	// We only want Joomla 3 and 4 Releases here
+	if ($joomlaLatestRelease->branch === 'Joomla! 3' || $joomlaLatestRelease->branch === 'Joomla! 4')
+	{
+		list($major, $minor, $patch) = explode('.', $joomlaLatestRelease->version);
+		$major = (int) $major;
+		$minor = (int) $minor;
+		$patch = (int) $patch;
+		$patch++;
 
-        $joomlaJsonData[] = $major . '.' . $minor . '.' . $patch;
-    }
+		$joomlaJsonData[] = $major . '.' . $minor . '.' . $patch;
+	}
 }
 
 $php530found = false;
 
 while ($php530found === false)
 {
-    $page = 0;
+	$page = 0;
 
-    // Get all PHP Releases via GitHub Releases
-    $phpReleases = json_decode(
-        $http->get(
-            'https://api.github.com/repos/php/php-src/tags?page=' . $page,
-            [
-                'Accept' => 'application/vnd.github.v3+json',
-                'token' => $configuration->get('github.gh.token')
-            ]
-        )->body
-    );
+	// Get all PHP Releases via GitHub Releases
+	$phpReleases = json_decode(
+		$http->get(
+			'https://api.github.com/repos/php/php-src/tags?page=' . $page,
+			[
+				'Accept' => 'application/vnd.github.v3+json',
+				'token' => $configuration->get('github.gh.token')
+			]
+		)->body
+	);
 
-    foreach ($phpReleases as $phpRelease)
-    {
+	foreach ($phpReleases as $phpRelease)
+	{
+		if (substr($phpRelease->name, 0, 4) === 'php-')
+		{
+			//$phpVersion = preg_replace('/[^0-9.]/', '', $phpRelease->name);
+			$phpVersion = str_replace('php-', '', $phpRelease->name);
 
-        var_dump($phpRelease);
-        exit;
+			if (!in_array($phpVersion, $phpJsonData))
+			{
+				$phpJsonData[] = $phpVersion;
+			}
 
-        if (substr($phpRelease->name, 0, 4) === 'php-')
-        {
-            //$phpVersion = preg_replace('/[^0-9.]/', '', $phpRelease->name);
-            $phpVersion = str_replace('php-', '', $phpRelease->name);
+			if ($phpVersion === '5.3.0')
+			{
+				$php530found = true;
+			}
+		}
+	}
 
-            if (!in_array($phpVersion, $phpJsonData))
-            {
-                $phpJsonData[] = $phpVersion;
-            }
-
-            if ($phpVersion === '5.3.0')
-            {
-                $php530found = true;
-            }
-        }
-    }
-
-    $page++;
+	$page++;
 }
 
 // Create output JSON

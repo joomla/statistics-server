@@ -22,6 +22,8 @@ Scrutinizer-CI: [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/joomla
 3. Copy `etc/config.dist.json` to `etc/config.json` and fill in your database credentials
 4. Run the `composer install` command to install all dependencies
 5. Run the `bin/stats install` command to create the application's database
+6. Run the `php cli/cron-update-versions.php` script to create the two files `versions/joomla.json` and `versions/php.json`
+7. Setup a cronjob for `php cli/cron-update-versions.php` to keep the version JSONs up-to-date.
 
 ## Additional Configuration
 
