@@ -92,6 +92,7 @@ class StatisticsRepository
 	public function getRecentlyUpdatedItems(): array
 	{
 		$return = [];
+		$db = $this->db;
 
 		foreach (self::ALLOWED_SOURCES as $column)
 		{
@@ -112,11 +113,11 @@ class StatisticsRepository
 			{
 				$return['cms_php_version'] = $this->db->setQuery(
 					$this->db->getQuery(true)
-						->select('CONCAT(' . $this->db->quoteName('cms_version') . ', ' . $this->db->quote(' - ') . ', ' . $this->db->quoteName('php_version') . ') AS cms_php_version')
+						->select('CONCAT(' . $db->qn('cms_version') . ', ' . $db->q(' - ') . ', ' . $db->qn('php_version') . ') AS cms_php_version')
 						->select('COUNT(*) AS count')
 						->from($this->db->quoteName('#__jstats'))
 						->where('modified BETWEEN DATE_SUB(NOW(), INTERVAL 90 DAY) AND NOW()')
-						->group('CONCAT(' . $this->db->quoteName('cms_version') . ', ' . $this->db->quote(' - ') . ', ' . $this->db->quoteName('php_version') . ')')
+						->group('CONCAT(' . $db->qn('cms_version') . ', ' . $db->q(' - ') . ', ' . $db->qn('php_version') . ')')
 				)->loadAssocList();
 				continue;
 			}
@@ -125,11 +126,11 @@ class StatisticsRepository
 			{
 				$return['db_type_version'] = $this->db->setQuery(
 					$this->db->getQuery(true)
-						->select('CONCAT(' . $this->db->quoteName('db_type') . ', ' . $this->db->quote(' - ') . ', ' . $this->db->quoteName('db_version') . ') AS db_type_version')
+						->select('CONCAT(' . $db->qn('db_type') . ', ' . $db->q(' - ') . ', ' . $db->qn('db_version') . ') AS db_type_version')
 						->select('COUNT(*) AS count')
 						->from($this->db->quoteName('#__jstats'))
 						->where('modified BETWEEN DATE_SUB(NOW(), INTERVAL 90 DAY) AND NOW()')
-						->group('CONCAT(' . $this->db->quoteName('db_type') . ', ' . $this->db->quote(' - ') . ', ' . $this->db->quoteName('db_version') . ')')
+						->group('CONCAT(' . $db->qn('db_type') . ', ' . $db->q(' - ') . ', ' . $db->qn('db_version') . ')')
 				)->loadAssocList();
 				continue;
 			}

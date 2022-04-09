@@ -149,7 +149,8 @@ class StatsJsonView extends JsonView
 							break;
 
 						case 'cms_php_version':
-							if ((isset($item['cms_version']) && $item['cms_version'] !== null) && (isset($item['php_version']) && $item['php_version'] !== null))
+							if ((isset($item['cms_version']) && $item['cms_version'] !== null)
+								&& (isset($item['php_version']) && $item['php_version'] !== null))
 							{
 								$index = $item['cms_version'] . ' - ' . $item['php_version'];
 								$cms_php_version[$index] = $item['count'];
@@ -160,7 +161,8 @@ class StatsJsonView extends JsonView
 							break;
 
 						case 'db_type_version':
-							if ((isset($item['db_type']) && $item['db_type'] !== null) && (isset($item['db_version']) && $item['db_version'] !== null))
+							if ((isset($item['db_type']) && $item['db_type'] !== null)
+								&& (isset($item['db_version']) && $item['db_version'] !== null))
 							{
 								$index = $item['db_type'] . ' - ' . $item['db_version'];
 								$db_type_version[$index] = $item['count'];
