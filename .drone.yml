@@ -1,0 +1,98 @@
+---
+kind: pipeline
+name: default
+
+clone:
+
+steps:
+  - name: composer
+    image: joomlaprojects/docker-images:php7.4
+    volumes:
+      - name: composer-cache
+        path: /tmp/composer-cache
+    commands:
+      - composer install --no-progress
+
+  - name: phpcs
+    image: joomlaprojects/docker-images:php7.2
+    depends_on: [ composer ]
+    commands:
+      - echo $(date)
+      - ./vendor/bin/phpcs --config-set installed_paths vendor/joomla/coding-standards
+      - ./vendor/bin/phpcs --extensions=php -p --standard=ruleset.xml .
+      - echo $(date)
+
+  - name: php72
+    depends_on: [ phpcs ]
+    image: joomlaprojects/docker-images:php7.2
+    commands:
+      - php -v
+      - ./vendor/bin/phpunit --configuration=phpunit.xml
+
+  - name: php73
+    depends_on: [ php72 ]
+    image: joomlaprojects/docker-images:php7.3
+    commands:
+      - php -v
+      - ./vendor/bin/phpunit --configuration=phpunit.xml
+
+  - name: php74
+    depends_on: [ php73 ]
+    image: joomlaprojects/docker-images:php7.4
+    commands:
+      - php -v
+      - ./vendor/bin/phpunit --configuration=phpunit.xml
+
+  - name: code_coverage
+    depends_on: [ php74 ]
+    image: joomlaprojects/docker-images:php7.2
+    commands:
+      - php -v
+      - ./vendor/bin/phpunit --configuration=phpunit.xml --coverage-clover=coverage.clover --verbose
+      - wget https://scrutinizer-ci.com/ocular.phar
+      - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+
+  - name: deployment
+    image: appleboy/drone-ssh
+    depends_on:
+      - php72
+      - php73
+      - php74
+    settings:
+      host:
+        from_secret: stats_host
+      username:
+        from_secret: stats_username
+      port: 22
+      key:
+        from_secret: stats_key
+      script:
+        - cd /home/devj/jstats-server
+        - bin/stats update:server
+        - chmod 644 www/index.php
+    when:
+      branch:
+        - master
+      status:
+        - success
+      event:
+        - push
+
+volumes:
+  - name: composer-cache
+    host:
+      path: /tmp/composer-cache
+
+services:
+  - name: mysql
+    image: mysql:5.7
+    environment:
+      MYSQL_USER: joomla_ut
+      MYSQL_PASSWORD: joomla_ut
+      MYSQL_ROOT_PASSWORD: joomla_ut
+      MYSQL_DATABASE: test_joomla
+---
+kind: signature
+hmac: 3988e28308c2536a3d5f2357f85ad9dcd1d612a8db67914fba739e3b4d849c74
+
+...
