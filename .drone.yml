@@ -27,28 +27,28 @@ steps:
     image: joomlaprojects/docker-images:php7.2
     commands:
       - php -v
-      - ./vendor/bin/phpunit --configuration=phpunit.xml
+      - ./vendor/bin/phpunit
 
   - name: php73
     depends_on: [ php72 ]
     image: joomlaprojects/docker-images:php7.3
     commands:
       - php -v
-      - ./vendor/bin/phpunit --configuration=phpunit.xml
+      - ./vendor/bin/phpunit
 
   - name: php74
     depends_on: [ php73 ]
     image: joomlaprojects/docker-images:php7.4
     commands:
       - php -v
-      - ./vendor/bin/phpunit --configuration=phpunit.xml
+      - ./vendor/bin/phpunit
 
   - name: code_coverage
     depends_on: [ php74 ]
     image: joomlaprojects/docker-images:php7.2
     commands:
       - php -v
-      - ./vendor/bin/phpunit --configuration=phpunit.xml --coverage-clover=coverage.clover --verbose
+      - ./vendor/bin/phpunit --coverage-clover=coverage.clover --verbose
       - wget https://scrutinizer-ci.com/ocular.phar
       - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
 
