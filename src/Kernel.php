@@ -63,7 +63,7 @@ abstract class Kernel implements ContainerAwareInterface
 	/**
 	 * Check if the Kernel is booted
 	 *
-	 * @return  void
+	 * @return  bool
 	 */
 	public function isBooted(): bool
 	{
@@ -90,7 +90,7 @@ abstract class Kernel implements ContainerAwareInterface
 	/**
 	 * Build the service container
 	 *
-	 * @return  void
+	 * @return  Container
 	 */
 	protected function buildContainer(): Container
 	{

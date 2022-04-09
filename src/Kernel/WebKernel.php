@@ -23,7 +23,7 @@ class WebKernel extends Kernel
 	/**
 	 * Build the service container
 	 *
-	 * @return  void
+	 * @return  Container
 	 */
 	protected function buildContainer(): Container
 	{

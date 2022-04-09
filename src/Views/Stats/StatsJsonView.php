@@ -274,6 +274,7 @@ class StatsJsonView extends JsonView
 					{
 						$item[$this->source] = 'unknown';
 					}
+
 					$data[$this->source][$item[$this->source]] = $item['count'];
 					break;
 
