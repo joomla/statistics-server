@@ -71,7 +71,7 @@ class MigrateCommandTest extends TestCase
 		$input  = new ArrayInput(
 			[
 				'command'   => 'database:migrate',
-				'--version' => 'abc123',
+				'--mversion' => 'abc123',
 			]
 		);
 		$output = new BufferedOutput;

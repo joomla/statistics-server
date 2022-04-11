@@ -65,7 +65,7 @@ class MigrateCommand extends AbstractCommand implements LoggerAwareInterface
 		$symfonyStyle->title('Database Migrations: Migrate');
 
 		// If a version is given, we are only executing that migration
-		$version = $input->getOption('version');
+		$version = $input->getOption('mversion');
 
 		try
 		{
@@ -108,7 +108,7 @@ class MigrateCommand extends AbstractCommand implements LoggerAwareInterface
 	{
 		$this->setDescription('Migrate the database schema to a newer version.');
 		$this->addOption(
-			'version',
+			'mversion',
 			null,
 			InputOption::VALUE_OPTIONAL,
 			'If specified, only the given migration will be executed if necessary.'
