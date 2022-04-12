@@ -7,7 +7,7 @@
 	</testsuites>
 
 	<php>
-		<env name="JOOMLA_TEST_DB_DRIVER" value="mysqli" />
+		<env name="JOOMLA_TEST_DB_DRIVER" value="mysql" />
 		<env name="JOOMLA_TEST_DB_HOST" value="mysql" />
 		<env name="JOOMLA_TEST_DB_DATABASE" value="test_joomla" />
 		<env name="JOOMLA_TEST_DB_USER" value="joomla_ut" />
