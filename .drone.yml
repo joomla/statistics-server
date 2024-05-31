@@ -68,6 +68,6 @@ services:
       MYSQL_DATABASE: test_joomla
 ---
 kind: signature
-hmac: 42f851d7eac0996537c469675d11140f7ed1f48baeda70a89f36f8d18d406c84
+hmac: 8be22045dcdba2900053efa460a017b12d49fa4b0e52f759424c359a503e13cf
 
 ...
