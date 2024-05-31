@@ -6,7 +6,7 @@ clone:
 
 steps:
   - name: composer
-    image: joomlaprojects/docker-images:php7.4
+    image: joomlaprojects/docker-images:php8.1
     volumes:
       - name: composer-cache
         path: /tmp/composer-cache
@@ -14,7 +14,7 @@ steps:
       - composer install --no-progress
 
   - name: phpcs
-    image: joomlaprojects/docker-images:php7.2
+    image: joomlaprojects/docker-images:php8.1
     depends_on: [ composer ]
     commands:
       - echo $(date)
@@ -22,42 +22,17 @@ steps:
       - ./vendor/bin/phpcs --extensions=php -p --standard=ruleset.xml .
       - echo $(date)
 
-  - name: php72
+  - name: php81
     depends_on: [ phpcs ]
-    image: joomlaprojects/docker-images:php7.2
+    image: joomlaprojects/docker-images:php8.1
     commands:
       - php -v
       - ./vendor/bin/phpunit
-
-  - name: php73
-    depends_on: [ php72 ]
-    image: joomlaprojects/docker-images:php7.3
-    commands:
-      - php -v
-      - ./vendor/bin/phpunit
-
-  - name: php74
-    depends_on: [ php73 ]
-    image: joomlaprojects/docker-images:php7.4
-    commands:
-      - php -v
-      - ./vendor/bin/phpunit
-
-  - name: code_coverage
-    depends_on: [ php74 ]
-    image: joomlaprojects/docker-images:php7.2
-    commands:
-      - php -v
-      - ./vendor/bin/phpunit --coverage-clover=coverage.clover --verbose
-      - wget https://scrutinizer-ci.com/ocular.phar
-      - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
 
   - name: deployment
     image: appleboy/drone-ssh
     depends_on:
-      - php72
-      - php73
-      - php74
+      - php81
     settings:
       host:
         from_secret: stats_host
