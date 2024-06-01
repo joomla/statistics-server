@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -18,53 +19,53 @@ use League\Flysystem\Filesystem;
  */
 class FlysystemServiceProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container): void
-	{
-		$container->share('filesystem.migrations', [$this, 'getMigrationsFilesystemService']);
-		$container->share('filesystem.snapshot', [$this, 'getSnapshotFilesystemService']);
-		$container->share('filesystem.versions', [$this, 'getVersionsFilesystemService']);
-	}
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container): void
+    {
+        $container->share('filesystem.migrations', [$this, 'getMigrationsFilesystemService']);
+        $container->share('filesystem.snapshot', [$this, 'getSnapshotFilesystemService']);
+        $container->share('filesystem.versions', [$this, 'getVersionsFilesystemService']);
+    }
 
-	/**
-	 * Get the `filesystem.migrations` service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  Filesystem
-	 */
-	public function getMigrationsFilesystemService(Container $container): Filesystem
-	{
-		return new Filesystem(new Local(APPROOT . '/etc/migrations'));
-	}
+    /**
+     * Get the `filesystem.migrations` service
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  Filesystem
+     */
+    public function getMigrationsFilesystemService(Container $container): Filesystem
+    {
+        return new Filesystem(new Local(APPROOT . '/etc/migrations'));
+    }
 
-	/**
-	 * Get the `filesystem.snapshot` service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  Filesystem
-	 */
-	public function getSnapshotFilesystemService(Container $container): Filesystem
-	{
-		return new Filesystem(new Local(APPROOT . '/snapshots'));
-	}
+    /**
+     * Get the `filesystem.snapshot` service
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  Filesystem
+     */
+    public function getSnapshotFilesystemService(Container $container): Filesystem
+    {
+        return new Filesystem(new Local(APPROOT . '/snapshots'));
+    }
 
-	/**
-	 * Get the `filesystem.versions` service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  Filesystem
-	 */
-	public function getVersionsFilesystemService(Container $container): Filesystem
-	{
-		return new Filesystem(new Local(APPROOT . '/versions'));
-	}
+    /**
+     * Get the `filesystem.versions` service
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  Filesystem
+     */
+    public function getVersionsFilesystemService(Container $container): Filesystem
+    {
+        return new Filesystem(new Local(APPROOT . '/versions'));
+    }
 }

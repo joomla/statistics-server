@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -17,27 +18,27 @@ use TheIconic\Tracking\GoogleAnalytics\Analytics;
  */
 class AnalyticsServiceProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container): void
-	{
-		$container->share(Analytics::class, [$this, 'getAnalyticsService']);
-	}
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container): void
+    {
+        $container->share(Analytics::class, [$this, 'getAnalyticsService']);
+    }
 
-	/**
-	 * Get the Analytics class service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  Analytics
-	 */
-	public function getAnalyticsService(Container $container): Analytics
-	{
-		return new Analytics(true);
-	}
+    /**
+     * Get the Analytics class service
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  Analytics
+     */
+    public function getAnalyticsService(Container $container): Analytics
+    {
+        return new Analytics(true);
+    }
 }

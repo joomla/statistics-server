@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -22,71 +23,70 @@ use TheIconic\Tracking\GoogleAnalytics\Analytics;
  */
 class EventServiceProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container): void
-	{
-		$container->alias(Dispatcher::class, DispatcherInterface::class)
-			->share(DispatcherInterface::class, [$this, 'getDispatcherService']);
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container): void
+    {
+        $container->alias(Dispatcher::class, DispatcherInterface::class)
+            ->share(DispatcherInterface::class, [$this, 'getDispatcherService']);
 
-		$container->share(AnalyticsSubscriber::class, [$this, 'getAnalyticsSubscriberService'])
-			->tag('event.subscriber', [AnalyticsSubscriber::class]);
+        $container->share(AnalyticsSubscriber::class, [$this, 'getAnalyticsSubscriberService'])
+            ->tag('event.subscriber', [AnalyticsSubscriber::class]);
 
-		$container->share(ErrorSubscriber::class, [$this, 'getErrorSubscriberService'])
-			->tag('event.subscriber', [ErrorSubscriber::class]);
-	}
+        $container->share(ErrorSubscriber::class, [$this, 'getErrorSubscriberService'])
+            ->tag('event.subscriber', [ErrorSubscriber::class]);
+    }
 
-	/**
-	 * Get the AnalyticsSubscriber service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  AnalyticsSubscriber
-	 */
-	public function getAnalyticsSubscriberService(Container $container): AnalyticsSubscriber
-	{
-		$subscriber = new AnalyticsSubscriber($container->get(Analytics::class));
-		$subscriber->setLogger($container->get(LoggerInterface::class));
+    /**
+     * Get the AnalyticsSubscriber service
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  AnalyticsSubscriber
+     */
+    public function getAnalyticsSubscriberService(Container $container): AnalyticsSubscriber
+    {
+        $subscriber = new AnalyticsSubscriber($container->get(Analytics::class));
+        $subscriber->setLogger($container->get(LoggerInterface::class));
 
-		return $subscriber;
-	}
+        return $subscriber;
+    }
 
-	/**
-	 * Get the DispatcherInterface service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  DispatcherInterface
-	 */
-	public function getDispatcherService(Container $container): DispatcherInterface
-	{
-		$dispatcher = new Dispatcher;
+    /**
+     * Get the DispatcherInterface service
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  DispatcherInterface
+     */
+    public function getDispatcherService(Container $container): DispatcherInterface
+    {
+        $dispatcher = new Dispatcher();
 
-		foreach ($container->getTagged('event.subscriber') as $subscriber)
-		{
-			$dispatcher->addSubscriber($subscriber);
-		}
+        foreach ($container->getTagged('event.subscriber') as $subscriber) {
+            $dispatcher->addSubscriber($subscriber);
+        }
 
-		return $dispatcher;
-	}
+        return $dispatcher;
+    }
 
-	/**
-	 * Get the ErrorSubscriber service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  ErrorSubscriber
-	 */
-	public function getErrorSubscriberService(Container $container): ErrorSubscriber
-	{
-		$subscriber = new ErrorSubscriber;
-		$subscriber->setLogger($container->get(LoggerInterface::class));
+    /**
+     * Get the ErrorSubscriber service
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  ErrorSubscriber
+     */
+    public function getErrorSubscriberService(Container $container): ErrorSubscriber
+    {
+        $subscriber = new ErrorSubscriber();
+        $subscriber->setLogger($container->get(LoggerInterface::class));
 
-		return $subscriber;
-	}
+        return $subscriber;
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -19,86 +20,81 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class MigrationStatusCommand extends AbstractCommand
 {
-	/**
-	 * The default command name
-	 *
-	 * @var  string|null
-	 */
-	protected static $defaultName = 'database:migrations:status';
+    /**
+     * The default command name
+     *
+     * @var  string|null
+     */
+    protected static $defaultName = 'database:migrations:status';
 
-	/**
-	 * Database migrations helper
-	 *
-	 * @var  Migrations
-	 */
-	private $migrations;
+    /**
+     * Database migrations helper
+     *
+     * @var  Migrations
+     */
+    private $migrations;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param   Migrations  $migrations  Database migrations helper
-	 */
-	public function __construct(Migrations $migrations)
-	{
-		$this->migrations = $migrations;
+    /**
+     * Constructor.
+     *
+     * @param   Migrations  $migrations  Database migrations helper
+     */
+    public function __construct(Migrations $migrations)
+    {
+        $this->migrations = $migrations;
 
-		parent::__construct();
-	}
+        parent::__construct();
+    }
 
-	/**
-	 * Internal function to execute the command.
-	 *
-	 * @param   InputInterface   $input   The input to inject into the command.
-	 * @param   OutputInterface  $output  The output to inject into the command.
-	 *
-	 * @return  integer  The command exit code
-	 */
-	protected function doExecute(InputInterface $input, OutputInterface $output): int
-	{
-		$symfonyStyle = new SymfonyStyle($input, $output);
+    /**
+     * Internal function to execute the command.
+     *
+     * @param   InputInterface   $input   The input to inject into the command.
+     * @param   OutputInterface  $output  The output to inject into the command.
+     *
+     * @return  integer  The command exit code
+     */
+    protected function doExecute(InputInterface $input, OutputInterface $output): int
+    {
+        $symfonyStyle = new SymfonyStyle($input, $output);
 
-		$symfonyStyle->title('Database Migrations: Check Status');
+        $symfonyStyle->title('Database Migrations: Check Status');
 
-		$status = $this->migrations->checkStatus();
+        $status = $this->migrations->checkStatus();
 
-		if (!$status->tableExists)
-		{
-			$symfonyStyle->comment('The migrations table does not exist, run the "database:migrate" command to set up the database.');
-		}
-		elseif ($status->latest)
-		{
-			$symfonyStyle->success('Your database is up-to-date.');
-		}
-		else
-		{
-			$symfonyStyle->comment(sprintf('Your database is not up-to-date. You are missing %d migration(s).', $status->missingMigrations));
+        if (!$status->tableExists) {
+            $symfonyStyle->comment('The migrations table does not exist, run the "database:migrate" command to set up the database.');
+        } elseif ($status->latest) {
+            $symfonyStyle->success('Your database is up-to-date.');
+        } else {
+            $symfonyStyle->comment(sprintf('Your database is not up-to-date. You are missing %d migration(s).', $status->missingMigrations));
 
-			$symfonyStyle->table(
-				[
-					'Current Version',
-					'Latest Version',
-				],
-				[
-					[
-						$status->currentVersion,
-						$status->latestVersion,
-					],
-				]
-			);
+            $symfonyStyle->table(
+                [
+                    'Current Version',
+                    'Latest Version',
+                ],
+                [
+                    [
+                        $status->currentVersion,
+                        $status->latestVersion,
+                    ],
+                ]
+            );
 
-			$symfonyStyle->comment('To update, run the "database:migrate" command.');
-		}
+            $symfonyStyle->comment('To update, run the "database:migrate" command.');
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 
-	/**
-	 * Configures the current command.
-	 *
-	 * @return  void
-	 */
-	protected function configure(): void
-	{
-		$this->setDescription('Check the database migration status.');
-	}
+    /**
+     * Configures the current command.
+     *
+     * @return  void
+     */
+    protected function configure(): void
+    {
+        $this->setDescription('Check the database migration status.');
+    }
 }

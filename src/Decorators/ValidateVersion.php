@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -13,15 +14,15 @@ namespace Joomla\StatsServer\Decorators;
  */
 trait ValidateVersion
 {
-	/**
-	 * Validates and filters the version number
-	 *
-	 * @param   string  $version  The version string to validate.
-	 *
-	 * @return  string|boolean  A validated version number on success or boolean false.
-	 */
-	protected function validateVersionNumber(string $version)
-	{
-		return preg_match('/\d+(?:\.\d+)+/', $version, $matches) ? $matches[0] : false;
-	}
+    /**
+     * Validates and filters the version number
+     *
+     * @param   string  $version  The version string to validate.
+     *
+     * @return  string|boolean  A validated version number on success or boolean false.
+     */
+    protected function validateVersionNumber(string $version)
+    {
+        return preg_match('/\d+(?:\.\d+)+/', $version, $matches) ? $matches[0] : false;
+    }
 }

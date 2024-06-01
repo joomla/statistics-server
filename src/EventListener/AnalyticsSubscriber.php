@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -22,80 +23,77 @@ use TheIconic\Tracking\GoogleAnalytics\Analytics;
  */
 class AnalyticsSubscriber implements SubscriberInterface, LoggerAwareInterface
 {
-	use LoggerAwareTrait;
+    use LoggerAwareTrait;
 
-	/**
-	 * Application analytics object.
-	 *
-	 * @var  Analytics
-	 */
-	private $analytics;
+    /**
+     * Application analytics object.
+     *
+     * @var  Analytics
+     */
+    private $analytics;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param   Analytics  $analytics  Application analytics object.
-	 */
-	public function __construct(Analytics $analytics)
-	{
-		$this->analytics = $analytics;
-	}
+    /**
+     * Constructor.
+     *
+     * @param   Analytics  $analytics  Application analytics object.
+     */
+    public function __construct(Analytics $analytics)
+    {
+        $this->analytics = $analytics;
+    }
 
-	/**
-	 * Returns an array of events this subscriber will listen to.
-	 *
-	 * @return  array
-	 */
-	public static function getSubscribedEvents(): array
-	{
-		return [
-			ApplicationEvents::BEFORE_EXECUTE => 'onBeforeExecute',
-		];
-	}
+    /**
+     * Returns an array of events this subscriber will listen to.
+     *
+     * @return  array
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ApplicationEvents::BEFORE_EXECUTE => 'onBeforeExecute',
+        ];
+    }
 
-	/**
-	 * Logs the visit to analytics if able.
-	 *
-	 * @param   ApplicationEvent  $event  Event object
-	 *
-	 * @return  void
-	 */
-	public function onBeforeExecute(ApplicationEvent $event): void
-	{
-		$app = $event->getApplication();
+    /**
+     * Logs the visit to analytics if able.
+     *
+     * @param   ApplicationEvent  $event  Event object
+     *
+     * @return  void
+     */
+    public function onBeforeExecute(ApplicationEvent $event): void
+    {
+        $app = $event->getApplication();
 
-		if (!($app instanceof WebApplicationInterface))
-		{
-			return;
-		}
+        if (!($app instanceof WebApplicationInterface)) {
+            return;
+        }
 
-		// On a GET request to the live domain, submit analytics data
-		if ($app->getInput()->getMethod() !== 'GET'
-			|| strpos($app->getInput()->server->getString('HTTP_HOST', ''), 'developer.joomla.org') !== 0)
-		{
-			return;
-		}
+        // On a GET request to the live domain, submit analytics data
+        if (
+            $app->getInput()->getMethod() !== 'GET'
+            || strpos($app->getInput()->server->getString('HTTP_HOST', ''), 'developer.joomla.org') !== 0
+        ) {
+            return;
+        }
 
-		$this->analytics->setAsyncRequest(true)
-			->setProtocolVersion('1')
-			->setTrackingId('UA-544070-16')
-			->setClientId(Uuid::uuid4()->toString())
-			->setDocumentPath($app->get('uri.base.path'))
-			->setIpOverride($app->getInput()->server->getString('REMOTE_ADDR', '127.0.0.1'))
-			->setUserAgentOverride($app->getInput()->server->getString('HTTP_USER_AGENT', 'JoomlaStats/1.0'));
+        $this->analytics->setAsyncRequest(true)
+            ->setProtocolVersion('1')
+            ->setTrackingId('UA-544070-16')
+            ->setClientId(Uuid::uuid4()->toString())
+            ->setDocumentPath($app->get('uri.base.path'))
+            ->setIpOverride($app->getInput()->server->getString('REMOTE_ADDR', '127.0.0.1'))
+            ->setUserAgentOverride($app->getInput()->server->getString('HTTP_USER_AGENT', 'JoomlaStats/1.0'));
 
-		// Don't allow sending Analytics data to cause a failure
-		try
-		{
-			$this->analytics->sendPageview();
-		}
-		catch (\Exception $e)
-		{
-			// Log the error for reference
-			$this->logger->error(
-				'Error sending analytics data.',
-				['exception' => $e]
-			);
-		}
-	}
+        // Don't allow sending Analytics data to cause a failure
+        try {
+            $this->analytics->sendPageview();
+        } catch (\Exception $e) {
+            // Log the error for reference
+            $this->logger->error(
+                'Error sending analytics data.',
+                ['exception' => $e]
+            );
+        }
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -23,105 +24,102 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class SnapshotCommand extends AbstractCommand
 {
-	/**
-	 * The default command name
-	 *
-	 * @var  string|null
-	 */
-	protected static $defaultName = 'snapshot';
+    /**
+     * The default command name
+     *
+     * @var  string|null
+     */
+    protected static $defaultName = 'snapshot';
 
-	/**
-	 * JSON view for displaying the statistics.
-	 *
-	 * @var  StatsJsonView
-	 */
-	private $view;
+    /**
+     * JSON view for displaying the statistics.
+     *
+     * @var  StatsJsonView
+     */
+    private $view;
 
-	/**
-	 * Filesystem adapter for the snapshots space.
-	 *
-	 * @var  Filesystem
-	 */
-	private $filesystem;
+    /**
+     * Filesystem adapter for the snapshots space.
+     *
+     * @var  Filesystem
+     */
+    private $filesystem;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param   StatsJsonView  $view        JSON view for displaying the statistics.
-	 * @param   Filesystem     $filesystem  Filesystem adapter for the snapshots space.
-	 */
-	public function __construct(StatsJsonView $view, Filesystem $filesystem)
-	{
-		$this->view       = $view;
-		$this->filesystem = $filesystem;
+    /**
+     * Constructor.
+     *
+     * @param   StatsJsonView  $view        JSON view for displaying the statistics.
+     * @param   Filesystem     $filesystem  Filesystem adapter for the snapshots space.
+     */
+    public function __construct(StatsJsonView $view, Filesystem $filesystem)
+    {
+        $this->view       = $view;
+        $this->filesystem = $filesystem;
 
-		parent::__construct();
-	}
+        parent::__construct();
+    }
 
-	/**
-	 * Internal function to execute the command.
-	 *
-	 * @param   InputInterface   $input   The input to inject into the command.
-	 * @param   OutputInterface  $output  The output to inject into the command.
-	 *
-	 * @return  integer  The command exit code
-	 */
-	protected function doExecute(InputInterface $input, OutputInterface $output): int
-	{
-		$symfonyStyle = new SymfonyStyle($input, $output);
+    /**
+     * Internal function to execute the command.
+     *
+     * @param   InputInterface   $input   The input to inject into the command.
+     * @param   OutputInterface  $output  The output to inject into the command.
+     *
+     * @return  integer  The command exit code
+     */
+    protected function doExecute(InputInterface $input, OutputInterface $output): int
+    {
+        $symfonyStyle = new SymfonyStyle($input, $output);
 
-		$symfonyStyle->title('Creating Statistics Snapshot');
+        $symfonyStyle->title('Creating Statistics Snapshot');
 
-		// We want the full raw data set for our snapshot
-		$this->view->isAuthorizedRaw(true);
+        // We want the full raw data set for our snapshot
+        $this->view->isAuthorizedRaw(true);
 
-		$source = $input->getOption('source');
+        $source = $input->getOption('source');
 
-		$filename = date('YmdHis');
+        $filename = date('YmdHis');
 
-		if ($source)
-		{
-			if (!\in_array($source, StatisticsRepository::ALLOWED_SOURCES))
-			{
-				throw new InvalidOptionException(
-					\sprintf(
-						'Invalid source "%s" given, valid options are: %s',
-						$source,
-						implode(', ', StatisticsRepository::ALLOWED_SOURCES)
-					)
-				);
-			}
+        if ($source) {
+            if (!\in_array($source, StatisticsRepository::ALLOWED_SOURCES)) {
+                throw new InvalidOptionException(
+                    \sprintf(
+                        'Invalid source "%s" given, valid options are: %s',
+                        $source,
+                        implode(', ', StatisticsRepository::ALLOWED_SOURCES)
+                    )
+                );
+            }
 
-			$this->view->setSource($source);
+            $this->view->setSource($source);
 
-			$filename .= '_' . $source;
-		}
+            $filename .= '_' . $source;
+        }
 
-		if (!$this->filesystem->write($filename, $this->view->render()))
-		{
-			$symfonyStyle->error('Failed writing snapshot to the filesystem.');
+        if (!$this->filesystem->write($filename, $this->view->render())) {
+            $symfonyStyle->error('Failed writing snapshot to the filesystem.');
 
-			return 1;
-		}
+            return 1;
+        }
 
-		$symfonyStyle->success('Snapshot recorded.');
+        $symfonyStyle->success('Snapshot recorded.');
 
-		return 0;
-	}
+        return 0;
+    }
 
-	/**
-	 * Configures the current command.
-	 *
-	 * @return  void
-	 */
-	protected function configure(): void
-	{
-		$this->setDescription('Takes a snapshot of the statistics data.');
-		$this->addOption(
-			'source',
-			null,
-			InputOption::VALUE_OPTIONAL,
-			'If given, filters the snapshot to a single source.'
-		);
-	}
+    /**
+     * Configures the current command.
+     *
+     * @return  void
+     */
+    protected function configure(): void
+    {
+        $this->setDescription('Takes a snapshot of the statistics data.');
+        $this->addOption(
+            'source',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'If given, filters the snapshot to a single source.'
+        );
+    }
 }

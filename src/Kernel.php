@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -31,115 +32,112 @@ use Monolog\Logger;
  */
 abstract class Kernel implements ContainerAwareInterface
 {
-	use ContainerAwareTrait;
+    use ContainerAwareTrait;
 
-	/**
-	 * Flag indicating this Kernel has been booted
-	 *
-	 * @var  boolean
-	 */
-	protected $booted = false;
+    /**
+     * Flag indicating this Kernel has been booted
+     *
+     * @var  boolean
+     */
+    protected $booted = false;
 
-	/**
-	 * Boot the Kernel
-	 *
-	 * @return  void
-	 */
-	public function boot(): void
-	{
-		if ($this->booted)
-		{
-			return;
-		}
+    /**
+     * Boot the Kernel
+     *
+     * @return  void
+     */
+    public function boot(): void
+    {
+        if ($this->booted) {
+            return;
+        }
 
-		$this->setContainer($this->buildContainer());
+        $this->setContainer($this->buildContainer());
 
-		// Register deprecation logging via Monolog
-		ErrorHandler::register($this->getContainer()->get(Logger::class), [E_DEPRECATED, E_USER_DEPRECATED], false, false);
+        // Register deprecation logging via Monolog
+        ErrorHandler::register($this->getContainer()->get(Logger::class), [E_DEPRECATED, E_USER_DEPRECATED], false, false);
 
-		$this->booted = true;
-	}
+        $this->booted = true;
+    }
 
-	/**
-	 * Check if the Kernel is booted
-	 *
-	 * @return  boolean
-	 */
-	public function isBooted(): bool
-	{
-		return $this->booted;
-	}
+    /**
+     * Check if the Kernel is booted
+     *
+     * @return  boolean
+     */
+    public function isBooted(): bool
+    {
+        return $this->booted;
+    }
 
-	/**
-	 * Run the kernel
-	 *
-	 * @return  void
-	 */
-	public function run(): void
-	{
-		$this->boot();
+    /**
+     * Run the kernel
+     *
+     * @return  void
+     */
+    public function run(): void
+    {
+        $this->boot();
 
-		if (!$this->getContainer()->has(AbstractApplication::class))
-		{
-			throw new \RuntimeException('The application has not been registered with the container.');
-		}
+        if (!$this->getContainer()->has(AbstractApplication::class)) {
+            throw new \RuntimeException('The application has not been registered with the container.');
+        }
 
-		$this->getContainer()->get(AbstractApplication::class)->execute();
-	}
+        $this->getContainer()->get(AbstractApplication::class)->execute();
+    }
 
-	/**
-	 * Build the service container
-	 *
-	 * @return  Container
-	 */
-	protected function buildContainer(): Container
-	{
-		$config = $this->loadConfiguration();
+    /**
+     * Build the service container
+     *
+     * @return  Container
+     */
+    protected function buildContainer(): Container
+    {
+        $config = $this->loadConfiguration();
 
-		$container = new Container;
-		$container->share('config', $config);
+        $container = new Container();
+        $container->share('config', $config);
 
-		$container->registerServiceProvider(new AnalyticsServiceProvider)
-			->registerServiceProvider(new ConsoleServiceProvider)
-			->registerServiceProvider(new DatabaseProvider)
-			->registerServiceProvider(new DatabaseServiceProvider)
-			->registerServiceProvider(new EventServiceProvider)
-			->registerServiceProvider(new FlysystemServiceProvider)
-			->registerServiceProvider(new GitHubServiceProvider)
-			->registerServiceProvider(new MonologServiceProvider)
-			->registerServiceProvider(new RepositoryServiceProvider)
-			->registerServiceProvider(new WebApplicationServiceProvider);
+        $container->registerServiceProvider(new AnalyticsServiceProvider())
+            ->registerServiceProvider(new ConsoleServiceProvider())
+            ->registerServiceProvider(new DatabaseProvider())
+            ->registerServiceProvider(new DatabaseServiceProvider())
+            ->registerServiceProvider(new EventServiceProvider())
+            ->registerServiceProvider(new FlysystemServiceProvider())
+            ->registerServiceProvider(new GitHubServiceProvider())
+            ->registerServiceProvider(new MonologServiceProvider())
+            ->registerServiceProvider(new RepositoryServiceProvider())
+            ->registerServiceProvider(new WebApplicationServiceProvider());
 
         $container->share(
-                \InfluxDB2\Client::class,
-                function (Container $container) {
-                    /** @var \Joomla\Registry\Registry $config */
-                    $config  = $container->get('config');
-                    $options = (array) $config->get('influxdb');
+            \InfluxDB2\Client::class,
+            function (Container $container) {
+                /** @var \Joomla\Registry\Registry $config */
+                $config  = $container->get('config');
+                $options = (array) $config->get('influxdb');
 
-                    return new \InfluxDB2\Client($options);
-                }
-            );
+                return new \InfluxDB2\Client($options);
+            }
+        );
 
 
-		return $container;
-	}
+        return $container;
+    }
 
-	/**
-	 * Load the application's configuration
-	 *
-	 * @return  Registry
-	 */
-	private function loadConfiguration(): Registry
-	{
-		$registry = new Registry;
-		$registry->loadFile(APPROOT . '/etc/config.dist.json');
+    /**
+     * Load the application's configuration
+     *
+     * @return  Registry
+     */
+    private function loadConfiguration(): Registry
+    {
+        $registry = new Registry();
+        $registry->loadFile(APPROOT . '/etc/config.dist.json');
 
-		if (file_exists(APPROOT . '/etc/config.json'))
-		{
-			$registry->loadFile(APPROOT . '/etc/config.json');
-		}
+        if (file_exists(APPROOT . '/etc/config.json')) {
+            $registry->loadFile(APPROOT . '/etc/config.json');
+        }
 
-		return $registry;
-	}
+        return $registry;
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -15,29 +16,27 @@ use Joomla\Github\Package as BasePackage;
  */
 abstract class Package extends BasePackage
 {
-	/**
-	 * Magic method to lazily create API objects
-	 *
-	 * @param   string  $name  Name of property to retrieve
-	 *
-	 * @return  Package  GitHub API package object.
-	 *
-	 * @throws  \InvalidArgumentException
-	 */
-	public function __get($name)
-	{
-		$class = __NAMESPACE__ . '\\' . $this->package . '\\' . ucfirst($name);
+    /**
+     * Magic method to lazily create API objects
+     *
+     * @param   string  $name  Name of property to retrieve
+     *
+     * @return  Package  GitHub API package object.
+     *
+     * @throws  \InvalidArgumentException
+     */
+    public function __get($name)
+    {
+        $class = __NAMESPACE__ . '\\' . $this->package . '\\' . ucfirst($name);
 
-		if (class_exists($class))
-		{
-			if (!isset($this->$name))
-			{
-				$this->$name = new $class($this->options, $this->client);
-			}
+        if (class_exists($class)) {
+            if (!isset($this->$name)) {
+                $this->$name = new $class($this->options, $this->client);
+            }
 
-			return $this->$name;
-		}
+            return $this->$name;
+        }
 
-		return parent::__get($name);
-	}
+        return parent::__get($name);
+    }
 }

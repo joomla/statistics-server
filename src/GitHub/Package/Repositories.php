@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -16,43 +17,43 @@ use Joomla\Http\Response;
  */
 class Repositories extends BaseRepositories
 {
-	/**
-	 * API Response object
-	 *
-	 * @var  Response
-	 */
-	private $apiResponse;
+    /**
+     * API Response object
+     *
+     * @var  Response
+     */
+    private $apiResponse;
 
-	/**
-	 * Get the last API response if one is set
-	 *
-	 * @return  Response|null
-	 */
-	public function getApiResponse()
-	{
-		return $this->apiResponse;
-	}
+    /**
+     * Get the last API response if one is set
+     *
+     * @return  Response|null
+     */
+    public function getApiResponse()
+    {
+        return $this->apiResponse;
+    }
 
-	/**
-	 * Get a list of tags on a repository.
-	 *
-	 * Note: This is different from the parent `getListTags` method as it adds support for the API's pagination. This extended method can be removed
-	 * if the upstream class gains this support.
-	 *
-	 * @param   string   $owner  Repository owner.
-	 * @param   string   $repo   Repository name.
-	 * @param   integer  $page   The page number from which to get items.
-	 *
-	 * @return  object
-	 */
-	public function getTags($owner, $repo, $page = 0)
-	{
-		// Build the request path.
-		$path = '/repos/' . $owner . '/' . $repo . '/tags';
+    /**
+     * Get a list of tags on a repository.
+     *
+     * Note: This is different from the parent `getListTags` method as it adds support for the API's pagination. This extended method can be removed
+     * if the upstream class gains this support.
+     *
+     * @param   string   $owner  Repository owner.
+     * @param   string   $repo   Repository name.
+     * @param   integer  $page   The page number from which to get items.
+     *
+     * @return  object
+     */
+    public function getTags($owner, $repo, $page = 0)
+    {
+        // Build the request path.
+        $path = '/repos/' . $owner . '/' . $repo . '/tags';
 
-		// Send the request.
-		$this->apiResponse = $this->client->get($this->fetchUrl($path, $page));
+        // Send the request.
+        $this->apiResponse = $this->client->get($this->fetchUrl($path, $page));
 
-		return $this->processResponse($this->apiResponse);
-	}
+        return $this->processResponse($this->apiResponse);
+    }
 }
