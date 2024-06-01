@@ -10,6 +10,7 @@ namespace Joomla\StatsServer\Controllers;
 
 use Joomla\Controller\AbstractController;
 use Joomla\StatsServer\Decorators\ValidateVersion;
+use Joomla\StatsServer\Repositories\InfluxdbRepository;
 use Joomla\StatsServer\Repositories\StatisticsRepository;
 use Laminas\Diactoros\Response\JsonResponse;
 use League\Flysystem\FileNotFoundException;
@@ -31,6 +32,13 @@ class SubmitDataController extends AbstractController
 	 * @var  StatisticsRepository
 	 */
 	private $repository;
+
+	/**
+	 * Influxdb repository.
+	 *
+	 * @var  InfluxdbRepository
+	 */
+	private $influxdbRepository;
 
 	/**
 	 * Filesystem adapter for the snapshots space.
@@ -60,10 +68,11 @@ class SubmitDataController extends AbstractController
 	 * @param   StatisticsRepository  $repository  Statistics repository.
 	 * @param   Filesystem            $filesystem  Filesystem adapter for the versions space.
 	 */
-	public function __construct(StatisticsRepository $repository, Filesystem $filesystem)
+	public function __construct(StatisticsRepository $repository, Filesystem $filesystem, InfluxdbRepository $influxdbRepository = null)
 	{
-		$this->repository = $repository;
-		$this->filesystem = $filesystem;
+		$this->repository         = $repository;
+		$this->filesystem         = $filesystem;
+		$this->influxdbRepository = $influxdbRepository;
 	}
 
 	/**
@@ -145,6 +154,9 @@ class SubmitDataController extends AbstractController
 		}
 
 		$this->repository->save((object) $data);
+        if ($this->influxdbRepository instanceof InfluxdbRepository) {
+            $this->influxdbRepository->save((object) $data);
+        }
 
 		/** @var JsonResponse $response */
 		$response = $this->getApplication()->getResponse();

@@ -110,6 +110,18 @@ abstract class Kernel implements ContainerAwareInterface
 			->registerServiceProvider(new RepositoryServiceProvider)
 			->registerServiceProvider(new WebApplicationServiceProvider);
 
+        $container->share(
+                \InfluxDB2\Client::class,
+                function (Container $container) {
+                    /** @var \Joomla\Registry\Registry $config */
+                    $config  = $container->get('config');
+                    $options = (array) $config->get('influxdb');
+
+                    return new \InfluxDB2\Client($options);
+                }
+            );
+
+
 		return $container;
 	}
 

@@ -7,6 +7,12 @@
 		"database": "",
 		"prefix"  : ""
 	},
+	"influxdb": {
+		"url"   : "",
+		"token" : "",
+		"org"   : "",
+		"bucket": ""
+	},
 	"stats": {
 		"rawdata": false
 	},

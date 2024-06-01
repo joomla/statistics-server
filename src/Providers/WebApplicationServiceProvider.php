@@ -20,6 +20,7 @@ use Joomla\Input\Input;
 use Joomla\Router\Router;
 use Joomla\StatsServer\Controllers\DisplayStatisticsController;
 use Joomla\StatsServer\Controllers\SubmitDataController;
+use Joomla\StatsServer\Repositories\InfluxdbRepository;
 use Joomla\StatsServer\Repositories\StatisticsRepository;
 use Joomla\StatsServer\Views\Stats\StatsJsonView;
 use Joomla\StatsServer\WebApplication;
@@ -167,7 +168,8 @@ class WebApplicationServiceProvider implements ServiceProviderInterface
 	{
 		$controller = new SubmitDataController(
 			$container->get(StatisticsRepository::class),
-			$container->get('filesystem.versions')
+			$container->get('filesystem.versions'),
+            $container->get(InfluxdbRepository::class),
 		);
 
 		$controller->setApplication($container->get(AbstractApplication::class));
