@@ -9,7 +9,7 @@ Scrutinizer-CI: [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/joomla
 
 ## Requirements
 
-* PHP 7.2+
+* PHP 8.1+
 * PDO with MySQL support
 * MySQL
 * Composer
