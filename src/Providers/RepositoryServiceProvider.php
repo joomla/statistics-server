@@ -9,6 +9,7 @@
 
 namespace Joomla\StatsServer\Providers;
 
+use InfluxDB2\Client;
 use Joomla\Database\DatabaseInterface;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
@@ -57,7 +58,7 @@ class RepositoryServiceProvider implements ServiceProviderInterface
     public function getInfluxdbRepositoryService(Container $container): InfluxdbRepository
     {
         return new InfluxdbRepository(
-            $container->get(\InfluxDB2\Client::class)
+            $container->get(Client::class)
         );
     }
 }

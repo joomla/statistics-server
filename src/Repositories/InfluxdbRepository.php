@@ -9,6 +9,7 @@
 
 namespace Joomla\StatsServer\Repositories;
 
+use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
 use InfluxDB2\Point;
 use Joomla\Database\DatabaseInterface;
@@ -20,16 +21,9 @@ use Joomla\Database\ParameterType;
 class InfluxdbRepository
 {
     /**
-     * Array containing the allowed sources
-     *
-     * @var  string[]
-     */
-    public const ALLOWED_SOURCES = ['php_version', 'db_type', 'db_version', 'cms_version', 'server_os', 'cms_php_version', 'db_type_version'];
-
-    /**
      * The database driver.
      *
-     * @var    DatabaseInterface
+     * @var    Client
      * @since  1.3.0
      */
     private $db;
@@ -37,9 +31,9 @@ class InfluxdbRepository
     /**
      * Instantiate the repository.
      *
-     * @param DatabaseInterface $db The database driver.
+     * @param Client $db The database driver.
      */
-    public function __construct(DatabaseInterface $db)
+    public function __construct(Client $db)
     {
         $this->db = $db;
     }
