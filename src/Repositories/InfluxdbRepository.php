@@ -103,7 +103,8 @@ class InfluxdbRepository
             } elseif (str_contains($data->db_type, 'mysql')) {
                 $dbServer = 'MySQL';
                 if (!empty($data->db_version)) {
-                    if (version_compare($data->db_version, '10.0.0', '>=')
+                    if (
+                        version_compare($data->db_version, '10.0.0', '>=')
                         // We know this is not 100% correct but more accurate than expecting MySQL with this version string
                         || version_compare($data->db_version, '5.5.5', '=')
                     ) {
