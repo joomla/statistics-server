@@ -58,82 +58,80 @@ class InfluxdbRepository
         // Set the modified date of the record
         $timestamp = (new \DateTime('now', new \DateTimeZone('UTC')))->getTimestamp();
 
-        $pointTemplate = Point::measurement('joomla')
+        $point = Point::measurement('joomla')
             ->addTag('unique_id', $data->unique_id)
-            ->addField('source', "stats_server")
             ->time($timestamp);
 
-        $point = clone $pointTemplate;
-        $point
-            ->addTag('php_version', $data->php_version)
-            ->addTag('db_type', $data->db_type)
-            ->addTag('db_version', $data->db_version)
-            ->addTag('cms_version', $data->cms_version)
-            ->addTag('server_os', $data->server_os);
-
-        $writeApi->write($point, WritePrecision::S, 'statistics');
-
         // Extract major and minor version
-        preg_match('/^(\d+)\.(\d+)\./', $data->cms_version, $matches);
+        if (!empty($data->php_version)) {
+            preg_match('/^(\d+)\.(\d+)\./', $data->php_version, $phpVersion);
+            $point->addField('php_version', $data->php_version);
+            if (!empty($phpVersion)) {
+                $point->addField('php_major', $phpVersion[1])
+                    ->addField('php_minor', $phpVersion[1] . '.' . $phpVersion[2]);
+            }
+        }
 
-        $point = clone $pointTemplate;
-        $point
-            ->addTag('cms_version', $data->cms_version)
-            ->addTag('cms_major', $matches[1])
-            ->addTag('cms_minor', $matches[1] . '.' . $matches[2]);
+        // Prepare CMS version
+        if (!empty($data->cms_version)) {
+            preg_match('/^(\d+)\.(\d+)\./', $data->cms_version, $cmsVersions);
 
-        $writeApi->write($point, WritePrecision::S, 'cms');
+            $point->addField('cms_version', $data->cms_version);
+            if (!empty($cmsVersions)) {
+                $point
+                    ->addField('cms_major', $cmsVersions[1])
+                    ->addField('cms_minor', $cmsVersions[1] . '.' . $cmsVersions[2]);
+            }
+        }
 
+        // Prepare Database versions
         if (!empty($data->db_version)) {
-            // Extract major and minor version
-            preg_match('/^(\d+)\.(\d+)\./', $data->db_version, $matches);
+            preg_match('/^(\d+)\.(\d+)\./', $data->db_version, $dbVersions);
 
-            $dbServer = 'Unknown';
+            $point->addField('db_version', $data->db_version);
+            if (!empty($dbVersions)) {
+                $point->addField('db_major', $dbVersions[1])
+                    ->addField('db_minor', $dbVersions[1] . '.' . $dbVersions[2]);
+            }
+        }
 
+        // Prepare Database Driver
+        if (!empty($data->db_type)) {
+            $dbServer = null;
             if ($data->db_type === 'postgresql') {
                 $dbServer = 'PostgreSQL';
             } elseif (str_contains($data->db_type, 'mysql')) {
-                if (version_compare($data->db_version, '10.0.0', '>=')) {
-                    $dbServer = 'MariaDB';
-                } else {
-                    $dbServer = 'MySQL';
+                $dbServer = 'MySQL';
+                if (!empty($data->db_version)) {
+                    if (version_compare($data->db_version, '10.0.0', '>=')
+                        // We know this is not 100% correct but more accurate than expecting MySQL with this version string
+                        || version_compare($data->db_version, '5.5.5', '=')
+                    ) {
+                        $dbServer = 'MariaDB';
+                    }
                 }
+            } elseif (str_contains($data->db_type, 'mariadb')) {
+                $dbServer = 'MariaDB';
             } elseif (str_contains($data->db_type, 'sqlsrv')) {
                 $dbServer = 'MSSQL';
             }
 
-            $point = clone $pointTemplate;
-            $point
-                ->addTag('db_version', $data->db_version)
-                ->addTag('db_driver', $data->db_type)
-                ->addTag('db_server', $dbServer)
-                ->addTag('db_major', $matches[1])
-                ->addTag('db_minor', $matches[1] . '.' . $matches[2]);
-
-            $writeApi->write($point, WritePrecision::S, 'database');
+            $point->addField('db_driver', $data->db_type);
+            if (!empty($dbServer)) {
+                $point->addField('db_server', $dbServer);
+            }
         }
 
+        // Prepare Operating System
         if (!empty($data->server_os)) {
             $os = explode(' ', $data->server_os, 2);
 
-            $point = clone $pointTemplate;
-            $point
-                ->addTag('server_version', $data->server_os)
-                ->addTag('server_os', $os[0]);
-
-            $writeApi->write($point, WritePrecision::S, 'os');
+            $point->addField('server_string', $data->server_os);
+            if (!empty($os[0])) {
+                $point->addField('server_os', $os[0]);
+            }
         }
 
-        // Extract major and minor version
-        preg_match('/^(\d+)\.(\d+)\./', $data->php_version, $matches);
-
-        if (!empty($data->php_version)) {
-            $point = clone $pointTemplate;
-            $point
-                ->addTag('php_version', $data->php_version)
-                ->addTag('db_major', $matches[1])
-                ->addTag('db_minor', $matches[1] . '.' . $matches[2]);
-            $writeApi->write($point, WritePrecision::S, 'php');
-        }
+        $writeApi->write($point, \InfluxDB2\Model\WritePrecision::S, 'cms');
     }
 }
