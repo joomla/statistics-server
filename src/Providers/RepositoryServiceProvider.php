@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -11,6 +12,7 @@ namespace Joomla\StatsServer\Providers;
 use Joomla\Database\DatabaseInterface;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
+use Joomla\StatsServer\Repositories\InfluxdbRepository;
 use Joomla\StatsServer\Repositories\StatisticsRepository;
 
 /**
@@ -18,29 +20,44 @@ use Joomla\StatsServer\Repositories\StatisticsRepository;
  */
 class RepositoryServiceProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container): void
-	{
-		$container->share(StatisticsRepository::class, [$this, 'getStatisticsRepositoryService']);
-	}
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container): void
+    {
+        $container->share(StatisticsRepository::class, [$this, 'getStatisticsRepositoryService']);
+        $container->share(InfluxdbRepository::class, [$this, 'getInfluxdbRepositoryService']);
+    }
 
-	/**
-	 * Get the StatisticsRepository service
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  StatisticsRepository
-	 */
-	public function getStatisticsRepositoryService(Container $container): StatisticsRepository
-	{
-		return new StatisticsRepository(
-			$container->get(DatabaseInterface::class)
-		);
-	}
+    /**
+     * Get the StatisticsRepository service
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  StatisticsRepository
+     */
+    public function getStatisticsRepositoryService(Container $container): StatisticsRepository
+    {
+        return new StatisticsRepository(
+            $container->get(DatabaseInterface::class)
+        );
+    }
+
+    /**
+     * Get the StatisticsRepository service
+     *
+     * @param   Container  $container  The DI container.
+     *
+     * @return  StatisticsRepository
+     */
+    public function getInfluxdbRepositoryService(Container $container): InfluxdbRepository
+    {
+        return new InfluxdbRepository(
+            $container->get(\InfluxDB2\Client::class)
+        );
+    }
 }

@@ -22,24 +22,23 @@
     <!-- Exclude non-PHP files -->
     <exclude-pattern>*/Gruntfile.js</exclude-pattern>
 
+    <rule ref="PSR12" />
+
+    <!-- temporary extend the line length -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="560"/>
+            <property name="absoluteLineLimit" value="560"/>
+        </properties>
+    </rule>
+
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <exclude-pattern type="relative">www/index\.php</exclude-pattern>
+    </rule>
+
     <file>./bin</file>
     <file>./src</file>
     <file>./tests</file>
     <file>./www</file>
 
-    <rule ref="Joomla">
-        <exclude name="Joomla.Commenting.ClassComment.MissingSinceTag"/>
-        <exclude name="Joomla.NamingConventions.ValidVariableName.MemberNotCamelCaps"/>
-        <exclude name="Joomla.NamingConventions.ValidVariableName.NotCamelCaps"/>
-        <exclude name="Joomla.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
-    </rule>
-
-    <rule ref="Joomla.Commenting.FileComment.MissingPackageTag">
-        <exclude-pattern>bin/stats</exclude-pattern>
-        <exclude-pattern>www/index.php</exclude-pattern>
-    </rule>
-
-    <rule ref="Joomla.Commenting.FunctionComment.MissingReturn">
-        <exclude-pattern>*/tests/*</exclude-pattern>
-    </rule>
 </ruleset>

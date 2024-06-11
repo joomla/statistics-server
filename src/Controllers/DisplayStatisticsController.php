@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -19,45 +20,45 @@ use Joomla\StatsServer\Views\Stats\StatsJsonView;
  */
 class DisplayStatisticsController extends AbstractController
 {
-	/**
-	 * JSON view for displaying the statistics.
-	 *
-	 * @var  StatsJsonView
-	 */
-	private $view;
+    /**
+     * JSON view for displaying the statistics.
+     *
+     * @var  StatsJsonView
+     */
+    private $view;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param   StatsJsonView  $view  JSON view for displaying the statistics.
-	 */
-	public function __construct(StatsJsonView $view)
-	{
-		$this->view = $view;
-	}
+    /**
+     * Constructor.
+     *
+     * @param   StatsJsonView  $view  JSON view for displaying the statistics.
+     */
+    public function __construct(StatsJsonView $view)
+    {
+        $this->view = $view;
+    }
 
-	/**
-	 * Execute the controller.
-	 *
-	 * @return  boolean
-	 */
-	public function execute()
-	{
-		// Check if we are allowed to receive the raw data
-		$authorizedRaw = $this->getInput()->server->getString('HTTP_JOOMLA_RAW', 'fail') === $this->getApplication()->get('stats.rawdata', false);
+    /**
+     * Execute the controller.
+     *
+     * @return  boolean
+     */
+    public function execute()
+    {
+        // Check if we are allowed to receive the raw data
+        $authorizedRaw = $this->getInput()->server->getString('HTTP_JOOMLA_RAW', 'fail') === $this->getApplication()->get('stats.rawdata', false);
 
-		// Check if a single data source is requested
-		$source = $this->getInput()->getString('source', '');
+        // Check if a single data source is requested
+        $source = $this->getInput()->getString('source', '');
 
-		// Check if a timeframe is requested
-		$timeframe = (int) $this->getInput()->getInt('timeframe', 0);
+        // Check if a timeframe is requested
+        $timeframe = (int) $this->getInput()->getInt('timeframe', 0);
 
-		$this->view->isAuthorizedRaw($authorizedRaw);
-		$this->view->setSource($source);
-		$this->view->setTimeframe($timeframe);
+        $this->view->isAuthorizedRaw($authorizedRaw);
+        $this->view->setSource($source);
+        $this->view->setTimeframe($timeframe);
 
-		$this->getApplication()->setBody($this->view->render());
+        $this->getApplication()->setBody($this->view->render());
 
-		return true;
-	}
+        return true;
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -20,28 +21,28 @@ use Psr\Log\LoggerInterface;
  */
 class WebKernel extends Kernel
 {
-	/**
-	 * Build the service container
-	 *
-	 * @return  Container
-	 */
-	protected function buildContainer(): Container
-	{
-		$container = parent::buildContainer();
+    /**
+     * Build the service container
+     *
+     * @return  Container
+     */
+    protected function buildContainer(): Container
+    {
+        $container = parent::buildContainer();
 
-		// Alias the web application to Joomla's base application class as this is the primary application for the environment
-		$container->alias(AbstractApplication::class, AbstractWebApplication::class);
+        // Alias the web application to Joomla's base application class as this is the primary application for the environment
+        $container->alias(AbstractApplication::class, AbstractWebApplication::class);
 
-		// Alias the web application logger as the primary logger for the environment
-		$container->alias('monolog', 'monolog.logger.application')
-			->alias('logger', 'monolog.logger.application')
-			->alias(Logger::class, 'monolog.logger.application')
-			->alias(LoggerInterface::class, 'monolog.logger.application');
+        // Alias the web application logger as the primary logger for the environment
+        $container->alias('monolog', 'monolog.logger.application')
+            ->alias('logger', 'monolog.logger.application')
+            ->alias(Logger::class, 'monolog.logger.application')
+            ->alias(LoggerInterface::class, 'monolog.logger.application');
 
-		// Set error reporting based on config
-		$errorReporting = (int) $container->get('config')->get('errorReporting', 0);
-		error_reporting($errorReporting);
+        // Set error reporting based on config
+        $errorReporting = (int) $container->get('config')->get('errorReporting', 0);
+        error_reporting($errorReporting);
 
-		return $container;
-	}
+        return $container;
+    }
 }

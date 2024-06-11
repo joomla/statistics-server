@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Joomla! Statistics Server
  *
@@ -13,38 +14,38 @@ namespace Joomla\StatsServer\Database;
  */
 class MigrationsStatus
 {
-	/**
-	 * The currently applied migration version
-	 *
-	 * @var  string|null
-	 */
-	public $currentVersion;
+    /**
+     * The currently applied migration version
+     *
+     * @var  string|null
+     */
+    public $currentVersion;
 
-	/**
-	 * Is the database at the latest version?
-	 *
-	 * @var  boolean
-	 */
-	public $latest = false;
+    /**
+     * Is the database at the latest version?
+     *
+     * @var  boolean
+     */
+    public $latest = false;
 
-	/**
-	 * The newest available migration version
-	 *
-	 * @var  string|null
-	 */
-	public $latestVersion;
+    /**
+     * The newest available migration version
+     *
+     * @var  string|null
+     */
+    public $latestVersion;
 
-	/**
-	 * Count of the number of missing migrations
-	 *
-	 * @var  integer
-	 */
-	public $missingMigrations = 0;
+    /**
+     * Count of the number of missing migrations
+     *
+     * @var  integer
+     */
+    public $missingMigrations = 0;
 
-	/**
-	 * Does the migrations table even exist?
-	 *
-	 * @var  boolean
-	 */
-	public $tableExists = true;
+    /**
+     * Does the migrations table even exist?
+     *
+     * @var  boolean
+     */
+    public $tableExists = true;
 }
